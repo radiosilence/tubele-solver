@@ -67,6 +67,11 @@ map: a station's role from its neighbour and line counts, and stops from the end
 search from each line's ends along that line only. `demo` and `bench` reveal the same facts in the
 same order. `play` does not ask for them.
 
+The clues are worth almost half a guess. Over all 420 answers the mean falls from 2.71 to 2.26
+guesses and the worst case from five to four, with 72% solved in two. The mode also changes the best
+opener: King's Cross St. Pancras for Underground answers, Clapham Junction for Overground, Devons
+Road for DLR, and any of several Elizabeth line stations east of Stratford.
+
 **Elimination.** A station stays a candidate only if, had it been the answer, every previous guess
 would have produced exactly the clues observed. If the map here ever disagrees with the game's
 (TfL rerouting a line, say) and nothing fits exactly, the solver keeps the stations that disagree
