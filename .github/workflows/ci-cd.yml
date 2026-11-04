@@ -110,9 +110,9 @@ jobs:
           path: tubele-solver-${{ matrix.name }}.tar.gz
           retention-days: ${{ needs.changes.outputs.release == 'true' && 90 || 7 }}
 
-  # Built on every change, since macOS is the main platform. A release binary
-  # is Developer ID signed and notarised; the notarise action fails when a
-  # signing secret is missing, so a release never ships an unsigned binary.
+  # Built on every change, since macOS is the main platform. Not notarised:
+  # Homebrew and mise download without the quarantine flag, so Gatekeeper
+  # never checks the binary, and the linker already ad-hoc signs it for arm64.
   build-macos:
     name: Build macos-arm64
     runs-on: macos-latest
@@ -130,17 +130,6 @@ jobs:
           save-if: ${{ github.ref == 'refs/heads/main' }}
           shared-key: macos
       - run: cargo build --release --locked --target "$TARGET"
-      - name: Sign and notarise
-        if: needs.changes.outputs.release == 'true'
-        uses: radiosilence/blit-workflows/macos-notarise@c8a650dfa5a0fbe012c61eab28f615c1983aee18
-        with:
-          binaries: |
-            target/aarch64-apple-darwin/release/tubele-solver
-          certificate-p12: ${{ secrets.MACOS_CERTIFICATE_P12 }}
-          certificate-password: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
-          api-key-p8: ${{ secrets.APPLE_API_KEY_P8 }}
-          api-key-id: ${{ secrets.APPLE_API_KEY_ID }}
-          api-issuer-id: ${{ secrets.APPLE_API_ISSUER_ID }}
       - name: Package
         run: |
           tar -czf "$GITHUB_WORKSPACE/tubele-solver-macos-arm64.tar.gz" -C "target/$TARGET/release" tubele-solver
