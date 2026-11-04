@@ -42,4 +42,9 @@ const rp=SD.returning_players;console.log('     returning_players tail',JSON.str
 const tod=SP.time_of_day.map(h=>h.finished);console.log('     practice by hour',tod.join(' '));
 const sz=D.stratfordTree.c.filter(x=>!x.w).map(x=>x.n||1);ck('blocks after Stratford under ten ("mostly") share',sz.filter(v=>v<10).length/sz.length,0.94,0.01);
 ck('panel worst (port) <= 4',Math.max(...D.adaptive.lengths),3,0);
+const G=JSON.parse(fs.readFileSync(path.join(docs,'build/stats/game.json')));const tv=Object.values(G.tiers);
+ck('standard tier count',tv.filter(t=>t==='standard').length,296,0);
+const never=tv.map((t,i)=>t==='never'?i:-1).filter(i=>i>=0);const eliz=D.lines.findIndex(l=>l[0]==='elizabeth');
+ck('never-tier stations served only by the Elizabeth line',never.filter(i=>D.stations[i][4]===(1<<eliz)).length,never.length,0);
+ck('two-building interchanges',G.outOfStationInterchange.length,5,0);
 console.log(bad?bad+' FAIL':'all ok');process.exit(bad?1:0);

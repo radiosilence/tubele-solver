@@ -42,6 +42,7 @@
     'worst.name': NAME(worst.s), 'worst.left': f2(worst.left), spread: f2(worst.mean - best.mean),
     bmax: D.bmax, ib: f3(D.infoBound), logbn: f2(Math.log(N) / Math.log(D.bmax)),
     cb: f3(D.clueBound), 'cb.gap': f3(adMean - D.clueBound), 'ad.mean': f3(adMean), 'ad.worst': adWorst,
+    'clue.role': f3(D.clues.role.H), 'clue.roleShown': f3(D.clues.roleShown.H), 'clue.roleGain': f3(D.clues.roleShown.H - D.clues.role.H),
     'clue.joint': f2(D.clues.joint.H), 'clue.unique': Object.values(joint).filter(c => c === 1).length,
     log2n: f2(log2n), 'kx.rank': ord(rankOf.get(D.kx)), 'kx.meand': f2(kxMeanD),
     'hp.b': f2(D.human.practice.fit.b), 'hd.b': f2(D.human.daily.fit.b), 'sm.b': f2(D.human.solverMap.fit.b),
@@ -77,6 +78,7 @@
       'b.h5d': pct(hd[4]), 'b.h6d': pct(hd[5]), 'b.h5p': pct(hp[4]), 'b.h6p': pct(hp[5]),
       'b.core': pct(core.wins / core.played), 'b.deep': pct(deep.wins / deep.played), 'b.tierz': zfmt(ztest(core.wins, core.played, deep.wins, deep.played)),
       'b.z1': f3(zd[0].map), 'b.zout': f3(zd[zd.length - 1].map),
+      'b.tcore': f3(D.behaviour.tierDifficulty[0].map), 'b.tdeep': f3(D.behaviour.tierDifficulty[2].map), 'b.tcorec': f3(D.behaviour.tierDifficulty[0].clues), 'b.tdeepc': f3(D.behaviour.tierDifficulty[2].clues), 'b.tstd': f3(D.behaviour.tierDifficulty[1].map), 'b.ncore': D.behaviour.tierDifficulty[0].n, 'b.ndeep': D.behaviour.tierDifficulty[2].n, 'b.nnever': D.behaviour.tierDifficulty[3].n,
       'b.kxu': f2(D.behaviour.kxUniformMean), 'b.kxgap': f2(D.behaviour.kxUniformMean - 6.07),
       'b.abd': pct(ab(SD)), 'b.abp': pct(ab(SP)),
     };

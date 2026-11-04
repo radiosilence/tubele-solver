@@ -108,6 +108,12 @@ function entropyOf(labels) {
 }
 const clues = {};
 for (const [k, f] of Object.entries(clueFns)) clues[k] = entropyOf(all.map(f));
+// The game labels an interchange whose lines meet in two buildings "Two
+// stations, one name" instead of "An interchange"; the solver folds it back
+// into interchange. Entropy of the role clue as the game displays it.
+const game = JSON.parse(fs.readFileSync(path.join(__dirname, 'stats', 'game.json'), 'utf8'));
+const ooi = new Set(game.outOfStationInterchange);
+clues.roleShown = entropyOf(all.map(i => role(i) === 'interchange' && ooi.has(raw.stations[i].name) ? 'two-stations' : role(i)));
 // Joint entropy of all clues together (what the panel would pin down alone).
 clues.joint = entropyOf(all.map(i => Object.values(clueFns).map(f => f(i)).join('|')));
 const perStation = all.map(i => ({ mode: modeOf(i), role: role(i), line: lineClue(i), end: endClue(i) }));
@@ -223,6 +229,7 @@ function byGuess(seqs) {
 const behaviour = {
   solverMap: byGuess(all.map(a => playSeq(a, stratford, false))),
   solverClues: byGuess(all.map(a => playSeq(a, null, true))),
+  tierDifficulty: ['core', 'standard', 'deep', 'never'].map(t => { const ids = all.filter(i => game.tiers[Object.keys(game.tiers)[i]] === t); return { t, n: ids.length, map: ids.reduce((s, i) => s + stratfordTree.lengths[i], 0) / ids.length, clues: ids.reduce((s, i) => s + adaptive.lengths[i], 0) / ids.length }; }),
   kxUniformMean: all.reduce((s, a) => s + net.dist[kx * N + a], 0) / N,
   zoneDifficulty: (() => { const groups = { 'Zone 1': [], 'Zone 2': [], 'Zones 3–4': [], 'Zones 5–6': [], 'Zone 7+ or outside': [] }; const L = stratfordTree.lengths; all.forEach(i => { const z = raw.stations[i].zones[0]; const key = z === 1 ? 'Zone 1' : z === 2 ? 'Zone 2' : z <= 4 ? 'Zones 3–4' : z <= 6 ? 'Zones 5–6' : 'Zone 7+ or outside'; groups[z ? key : 'Zone 7+ or outside'].push(i); }); return Object.entries(groups).map(([k, ids]) => ({ k, n: ids.length, map: ids.reduce((s, i) => s + L[i], 0) / ids.length, clues: ids.reduce((s, i) => s + adaptive.lengths[i], 0) / ids.length })); })(),
 };
