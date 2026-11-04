@@ -94,8 +94,11 @@ pub struct Suggestion {
     pub could_win: bool,
 }
 
-pub fn analyse(net: &Network, observations: &[Observation]) -> Analysis {
-    let guessed: Vec<usize> = observations.iter().map(|o| o.guess).collect();
+/// `skip` holds stations the game refused as guesses: they cannot be answers
+/// either, and are never suggested.
+pub fn analyse(net: &Network, observations: &[Observation], skip: &[usize]) -> Analysis {
+    let mut guessed: Vec<usize> = observations.iter().map(|o| o.guess).collect();
+    guessed.extend_from_slice(skip);
     let scored: Vec<(usize, u32)> = (0..net.len())
         .filter(|s| {
             !guessed.contains(s)
@@ -183,7 +186,7 @@ pub fn play(net: &Network, answer: usize, opener: Option<usize>) -> Vec<Observat
     loop {
         let guess = match (obs.is_empty(), opener) {
             (true, Some(o)) => o,
-            _ => analyse(net, &obs).ranked[0].station,
+            _ => analyse(net, &obs, &[]).ranked[0].station,
         };
         let feedback = Feedback::compute(net, guess, answer);
         obs.push(Observation { guess, feedback });

@@ -1,4 +1,5 @@
 mod network;
+mod site;
 mod solver;
 mod tui;
 
@@ -6,6 +7,7 @@ use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
 use network::Network;
 use std::time::{SystemTime, UNIX_EPOCH};
+use tui::Referee;
 
 /// Solve Tubele by guessing and narrowing down, using the TfL network map.
 #[derive(Parser)]
@@ -17,10 +19,24 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Command {
-    /// Solve today's game: enter each guess and what the game said about it.
+    /// Play today's game at tubele.app by itself (the default).
+    Auto {
+        /// Opening guess; without one, pick it in the UI.
+        #[arg(long)]
+        start: Option<String>,
+        /// Show the browser window instead of running it headless.
+        #[arg(long)]
+        show: bool,
+    },
+    /// Play alongside the browser yourself, typing in what the game says.
     Play,
     /// Watch the solver play against a hidden station (random if none given).
-    Demo { station: Option<String> },
+    Demo {
+        station: Option<String>,
+        /// Opening guess; without one, pick it in the UI.
+        #[arg(long)]
+        start: Option<String>,
+    },
     /// Play every station as the answer and report how many guesses it takes.
     Bench,
     /// Rebuild data/network.json from the TfL Unified API.
@@ -28,20 +44,28 @@ enum Command {
 }
 
 fn main() -> Result<()> {
-    match Cli::parse().command.unwrap_or(Command::Play) {
-        Command::Play => tui::run(Network::embedded(), None),
-        Command::Demo { station } => {
+    let command = Cli::parse().command.unwrap_or(Command::Auto {
+        start: None,
+        show: false,
+    });
+    match command {
+        Command::Auto { start, show } => {
             let net = Network::embedded();
+            let opener = start.map(|s| find(&net, &s)).transpose()?;
+            tui::run(net, Referee::Live(site::Site::launch(show)), opener)
+        }
+        Command::Play => tui::run(Network::embedded(), Referee::Manual, None),
+        Command::Demo { station, start } => {
+            let net = Network::embedded();
+            let opener = start.map(|s| find(&net, &s)).transpose()?;
             let answer = match station {
-                Some(name) => net
-                    .find(&name)
-                    .with_context(|| format!("no station called {name:?}"))?,
+                Some(name) => find(&net, &name)?,
                 None => {
                     let nanos = SystemTime::now().duration_since(UNIX_EPOCH)?.subsec_nanos();
                     nanos as usize % net.len()
                 }
             };
-            tui::run(net, Some(answer))
+            tui::run(net, Referee::Simulated(answer), opener)
         }
         Command::Bench => {
             bench(&Network::embedded());
@@ -57,8 +81,13 @@ fn main() -> Result<()> {
     }
 }
 
+fn find(net: &Network, name: &str) -> Result<usize> {
+    net.find(name)
+        .with_context(|| format!("no station called {name:?}"))
+}
+
 fn bench(net: &Network) {
-    let opener = solver::analyse(net, &[]).ranked[0].station;
+    let opener = solver::analyse(net, &[], &[]).ranked[0].station;
     println!("opening guess: {}", net.stations[opener].name);
     let mut histogram = vec![0usize; 21];
     let mut worst = Vec::new();

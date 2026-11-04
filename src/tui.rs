@@ -1,4 +1,5 @@
 use crate::network::{LINES, Network, line_code, line_colour, line_name};
+use crate::site::{Event as SiteEvent, Site};
 use crate::solver::{self, Analysis, Feedback, Observation, ZoneMatch};
 use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
@@ -34,14 +35,36 @@ enum Stage {
         zone: ZoneMatch,
         shared: u32,
     },
+    /// A guess is out at tubele.app and the page has not answered yet.
+    Waiting(usize),
     Done,
+}
+
+/// Who scores a guess.
+pub enum Referee {
+    /// The player reads the game's feedback back in.
+    Manual,
+    /// A known answer, for demos. The solver never sees it.
+    Simulated(usize),
+    /// The live game, played in a headless browser.
+    Live(Site),
+}
+
+enum LiveState {
+    Connecting,
+    Ready(String),
+    Error(String),
 }
 
 struct App {
     net: Network,
-    /// Set in demo mode; the solver never looks at it, only the referee does.
-    answer: Option<usize>,
+    referee: Referee,
+    live: LiveState,
+    /// Opening guess chosen on the command line.
+    opener: Option<usize>,
     obs: Vec<Observation>,
+    /// Stations the live game did not recognise; never guessed again.
+    skip: Vec<usize>,
     analysis: Analysis,
     stage: Stage,
     full_map: bool,
@@ -49,40 +72,109 @@ struct App {
     last_step: Instant,
 }
 
-pub fn run(net: Network, answer: Option<usize>) -> Result<()> {
-    let analysis = solver::analyse(&net, &[]);
-    let mut app = App {
-        net,
-        answer,
-        obs: Vec::new(),
-        analysis,
-        stage: Stage::Pick {
-            query: String::new(),
-            cursor: 0,
-        },
-        full_map: false,
-        autoplay: false,
-        last_step: Instant::now(),
-    };
+pub fn run(net: Network, referee: Referee, opener: Option<usize>) -> Result<()> {
+    let mut app = App::new(net, referee, opener);
     let mut terminal = ratatui::init();
     let result = app.event_loop(&mut terminal);
     ratatui::restore();
     result
 }
 
+/// Cheap randomness for picking a random opener; nothing here needs better.
+fn random_below(n: usize) -> usize {
+    let nanos = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_nanos())
+        .unwrap_or(0);
+    let mut x = nanos as u64 ^ 0x9E37_79B9_7F4A_7C15;
+    x ^= x >> 33;
+    x = x.wrapping_mul(0xff51_afd7_ed55_8ccd);
+    x ^= x >> 33;
+    (x % n.max(1) as u64) as usize
+}
+
 impl App {
+    fn new(net: Network, referee: Referee, opener: Option<usize>) -> Self {
+        let analysis = solver::analyse(&net, &[], &[]);
+        let live = matches!(referee, Referee::Live(_));
+        Self {
+            net,
+            referee,
+            live: LiveState::Connecting,
+            opener,
+            obs: Vec::new(),
+            skip: Vec::new(),
+            analysis,
+            stage: Stage::Pick {
+                query: String::new(),
+                cursor: 0,
+            },
+            full_map: false,
+            // Live play and a demo with a chosen opener run by themselves.
+            autoplay: live || opener.is_some(),
+            last_step: Instant::now(),
+        }
+    }
+
     fn event_loop(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
         loop {
+            self.poll_site();
             terminal.draw(|f| self.draw(f))?;
-            if event::poll(Duration::from_millis(100))? {
+            if event::poll(Duration::from_millis(80))? {
                 if let Event::Key(key) = event::read()?
                     && key.kind == KeyEventKind::Press
                     && !self.on_key(key)
                 {
                     return Ok(());
                 }
-            } else if self.autoplay && self.last_step.elapsed() > Duration::from_millis(1400) {
-                self.demo_step();
+            } else if self.autoplay && self.last_step.elapsed() > Duration::from_millis(900) {
+                self.step();
+            }
+        }
+    }
+
+    fn is_live(&self) -> bool {
+        matches!(self.referee, Referee::Live(_))
+    }
+
+    fn ready(&self) -> bool {
+        !self.is_live() || matches!(self.live, LiveState::Ready(_))
+    }
+
+    fn poll_site(&mut self) {
+        let Referee::Live(site) = &self.referee else {
+            return;
+        };
+        let Ok(event) = site.rx.try_recv() else {
+            return;
+        };
+        match event {
+            SiteEvent::Ready { puzzle } => {
+                self.live = LiveState::Ready(puzzle);
+                self.last_step = Instant::now();
+            }
+            SiteEvent::Failed(e) => {
+                self.live = LiveState::Error(e);
+                self.autoplay = false;
+            }
+            SiteEvent::Row(row) => {
+                let Stage::Waiting(guess) = self.stage else {
+                    return;
+                };
+                match row.and_then(|r| r.feedback(&self.net, guess)) {
+                    Ok(feedback) => self.commit(Observation { guess, feedback }),
+                    Err(e) => {
+                        // The game did not take this station; rule it out and carry on.
+                        self.live = LiveState::Error(format!("{e:#}"));
+                        self.skip.push(guess);
+                        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
+                        self.stage = Stage::Pick {
+                            query: String::new(),
+                            cursor: 0,
+                        };
+                        self.last_step = Instant::now();
+                    }
+                }
             }
         }
     }
@@ -91,51 +183,82 @@ impl App {
         self.analysis.ranked.first().map(|s| s.station)
     }
 
+    fn excluded(&self, s: usize) -> bool {
+        self.skip.contains(&s) || self.obs.iter().any(|o| o.guess == s)
+    }
+
     fn matches(&self, query: &str) -> Vec<usize> {
-        let guessed: Vec<usize> = self.obs.iter().map(|o| o.guess).collect();
         self.net
             .search(query)
             .into_iter()
-            .filter(|s| !guessed.contains(s))
+            .filter(|&s| !self.excluded(s))
             .take(8)
             .collect()
     }
 
+    /// A random station, optionally from one fare zone.
+    fn random_station(&self, zone: Option<u8>) -> Option<usize> {
+        let pool: Vec<usize> = (0..self.net.len())
+            .filter(|&s| !self.excluded(s))
+            .filter(|&s| zone.is_none_or(|z| self.net.stations[s].zones.contains(&z)))
+            .collect();
+        pool.get(random_below(pool.len())).copied()
+    }
+
     fn commit(&mut self, obs: Observation) {
         self.obs.push(obs);
-        self.analysis = solver::analyse(&self.net, &self.obs);
+        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
         self.last_step = Instant::now();
-        self.stage = if obs.feedback.is_win() || self.analysis.candidates.is_empty() {
-            Stage::Done
-        } else {
-            Stage::Pick {
-                query: String::new(),
-                cursor: 0,
-            }
-        };
+        let out_of_guesses = self.is_live() && self.obs.len() >= MAX_GUESSES;
+        self.stage =
+            if obs.feedback.is_win() || self.analysis.candidates.is_empty() || out_of_guesses {
+                Stage::Done
+            } else {
+                Stage::Pick {
+                    query: String::new(),
+                    cursor: 0,
+                }
+            };
+        if matches!(self.stage, Stage::Done) {
+            self.autoplay = false;
+        }
     }
 
     fn undo(&mut self) {
+        // A guess made on the live site cannot be taken back.
+        if self.is_live() {
+            return;
+        }
         self.obs.pop();
-        self.analysis = solver::analyse(&self.net, &self.obs);
+        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
         self.stage = Stage::Pick {
             query: String::new(),
             cursor: 0,
         };
     }
 
-    /// Guess `station`. In demo mode the referee scores it at once; otherwise
-    /// the player reads the game's answer back in.
     fn guess(&mut self, station: usize) {
-        match self.answer {
-            Some(answer) => {
-                let feedback = Feedback::compute(&self.net, station, answer);
+        if !self.ready() {
+            return;
+        }
+        // Any guess made by hand hands the rest of the game to the solver.
+        self.autoplay |= self.is_live();
+        match &self.referee {
+            Referee::Simulated(answer) => {
+                let feedback = Feedback::compute(&self.net, station, *answer);
                 self.commit(Observation {
                     guess: station,
                     feedback,
                 });
             }
-            None => {
+            Referee::Live(site) => {
+                site.guess(&self.net.stations[station].name);
+                self.stage = Stage::Waiting(station);
+                if matches!(self.live, LiveState::Error(_)) {
+                    self.live = LiveState::Ready(String::new());
+                }
+            }
+            Referee::Manual => {
                 self.stage = Stage::Feedback {
                     guess: station,
                     stops: String::new(),
@@ -146,14 +269,21 @@ impl App {
         }
     }
 
-    fn demo_step(&mut self) {
-        if matches!(self.stage, Stage::Pick { .. })
-            && let Some(s) = self.suggestion()
-        {
-            self.guess(s);
+    /// Make the next guess: the chosen opener first, then the solver's pick.
+    fn step(&mut self) {
+        if !self.ready() || !matches!(self.stage, Stage::Pick { .. }) {
+            return;
         }
-        if matches!(self.stage, Stage::Done) {
-            self.autoplay = false;
+        if self.obs.is_empty() && self.skip.is_empty() {
+            match self.opener {
+                Some(o) => return self.guess(o),
+                // In live play the player picks the opener unless one was given.
+                None if self.is_live() => return,
+                None => {}
+            }
+        }
+        if let Some(s) = self.suggestion() {
+            self.guess(s);
         }
     }
 
@@ -172,7 +302,13 @@ impl App {
             }
             _ => {}
         }
+        let simulated = matches!(self.referee, Referee::Simulated(_));
         match &mut self.stage {
+            Stage::Waiting(_) => {
+                if key.code == KeyCode::Esc {
+                    return false;
+                }
+            }
             Stage::Done => match key.code {
                 KeyCode::Char('q') | KeyCode::Esc | KeyCode::Enter => return false,
                 KeyCode::Char('u') | KeyCode::Backspace => self.undo(),
@@ -184,10 +320,21 @@ impl App {
                     query.clear();
                     *cursor = 0;
                 }
-                KeyCode::Char(' ') if self.answer.is_some() && query.is_empty() => self.demo_step(),
-                KeyCode::Char('a') if self.answer.is_some() && query.is_empty() => {
+                KeyCode::Char(' ') if simulated && query.is_empty() => self.step(),
+                KeyCode::Char('a') if simulated && query.is_empty() => {
                     self.autoplay = !self.autoplay;
                     self.last_step = Instant::now();
+                }
+                // No station name starts with a digit or '?', so these are free.
+                KeyCode::Char(c @ '1'..='9') if query.is_empty() => {
+                    if let Some(s) = self.random_station(Some(c as u8 - b'0')) {
+                        self.guess(s);
+                    }
+                }
+                KeyCode::Char('?') if query.is_empty() => {
+                    if let Some(s) = self.random_station(None) {
+                        self.guess(s);
+                    }
                 }
                 KeyCode::Char(c) => {
                     query.push(c);
@@ -340,11 +487,39 @@ impl App {
                 Style::new().fg(MUTED),
             ),
         ];
-        if self.answer.is_some() {
-            spans.push(Span::styled("  ·  demo", Style::new().fg(SUGGEST)));
-            if self.autoplay {
-                spans.push(Span::styled(" ▶ autoplay", Style::new().fg(SUGGEST)));
+        let dot = || Span::styled("  ·  ", Style::new().fg(FAINT));
+        match (&self.referee, &self.live) {
+            (Referee::Simulated(_), _) => {
+                spans.extend([dot(), Span::styled("demo", Style::new().fg(SUGGEST))]);
             }
+            (Referee::Live(_), LiveState::Connecting) => {
+                spans.extend([
+                    dot(),
+                    Span::styled("opening tubele.app…", Style::new().fg(MUTED)),
+                ]);
+            }
+            (Referee::Live(_), LiveState::Ready(puzzle)) => {
+                spans.extend([
+                    dot(),
+                    Span::styled(
+                        format!("live on tubele.app {puzzle}"),
+                        Style::new().fg(Color::Rgb(0x5b, 0xbd, 0x72)),
+                    ),
+                ]);
+            }
+            (Referee::Live(_), LiveState::Error(e)) => {
+                spans.extend([
+                    dot(),
+                    Span::styled(
+                        format!("⚠ {e}"),
+                        Style::new().fg(Color::Rgb(0xff, 0x8c, 0x42)),
+                    ),
+                ]);
+            }
+            (Referee::Manual, _) => {}
+        }
+        if self.autoplay && !matches!(self.stage, Stage::Done) {
+            spans.push(Span::styled(" ▶ auto", Style::new().fg(SUGGEST)));
         }
         if self.analysis.mismatch > 0 {
             spans.push(Span::styled(
@@ -366,6 +541,7 @@ impl App {
         };
         let suggestion = match self.stage {
             Stage::Pick { .. } => self.suggestion(),
+            Stage::Waiting(g) => Some(g),
             _ => None,
         };
         let focus: Vec<usize> = if self.full_map {
@@ -516,6 +692,13 @@ impl App {
                         Style::new().fg(TEXT),
                     ),
                 ]),
+                _ if self.obs.len() >= MAX_GUESSES => Line::styled(
+                    format!(
+                        "Out of guesses. Still possible: {}",
+                        self.analysis.candidates.len()
+                    ),
+                    Style::new().fg(MUTED),
+                ),
                 _ => Line::styled(
                     "No station fits. Ctrl-Z to undo a guess.",
                     Style::new().fg(MUTED),
@@ -651,18 +834,29 @@ impl App {
                     options.push(Span::styled(format!(" {name} "), style));
                     options.push(Span::raw(" "));
                 }
-                let mut help = vec![key("enter"), hint("guess"), key("↑↓"), hint("choose")];
-                if self.answer.is_some() {
+                let mut help = vec![
+                    key("enter"),
+                    hint("guess"),
+                    key("↑↓"),
+                    hint("choose"),
+                    key("1-9"),
+                    hint("random station in zone"),
+                    key("?"),
+                    hint("random station"),
+                ];
+                if matches!(self.referee, Referee::Simulated(_)) {
                     help.extend([key("space"), hint("step"), key("a"), hint("autoplay")]);
                 }
-                help.extend([
-                    key("tab"),
-                    hint("map"),
-                    key("^z"),
-                    hint("undo"),
-                    key("esc"),
-                    hint("quit"),
-                ]);
+                if !self.is_live() {
+                    help.extend([key("^z"), hint("undo")]);
+                }
+                help.extend([key("tab"), hint("map"), key("esc"), hint("quit")]);
+                if self.is_live() && self.obs.is_empty() && self.skip.is_empty() {
+                    prompt.push(Span::styled(
+                        "   pick an opener; the solver plays the rest",
+                        Style::new().fg(SUGGEST),
+                    ));
+                }
                 (
                     "guess",
                     vec![Line::from(prompt), Line::from(options), Line::from(help)],
@@ -734,6 +928,22 @@ impl App {
                     ],
                 )
             }
+            Stage::Waiting(guess) => (
+                "playing",
+                vec![
+                    Line::from(vec![
+                        Span::styled("› ", Style::new().fg(ACCENT).bold()),
+                        Span::styled("guessing ", Style::new().fg(MUTED)),
+                        Span::styled(
+                            self.net.stations[*guess].name.clone(),
+                            Style::new().fg(SUGGEST).bold(),
+                        ),
+                        Span::styled(" on tubele.app…", Style::new().fg(MUTED)),
+                    ]),
+                    Line::default(),
+                    Line::from(vec![key("tab"), hint("map"), key("esc"), hint("quit")]),
+                ],
+            ),
             Stage::Done => (
                 "done",
                 vec![Line::from(vec![
@@ -884,21 +1094,8 @@ mod tests {
     use ratatui::{Terminal, backend::TestBackend};
 
     fn app(answer: Option<usize>) -> App {
-        let net = Network::embedded();
-        let analysis = solver::analyse(&net, &[]);
-        App {
-            net,
-            answer,
-            obs: Vec::new(),
-            analysis,
-            stage: Stage::Pick {
-                query: String::new(),
-                cursor: 0,
-            },
-            full_map: false,
-            autoplay: false,
-            last_step: Instant::now(),
-        }
+        let referee = answer.map_or(Referee::Manual, Referee::Simulated);
+        App::new(Network::embedded(), referee, None)
     }
 
     fn render(app: &App) -> String {
@@ -920,10 +1117,10 @@ mod tests {
         let net = Network::embedded();
         let mut app = app(net.find("Bank"));
         println!("{}", render(&app));
-        app.demo_step();
+        app.step();
         println!("{}", render(&app));
         while !matches!(app.stage, Stage::Done) {
-            app.demo_step();
+            app.step();
         }
         println!("{}", render(&app));
         assert!(app.obs.last().unwrap().feedback.is_win());
@@ -937,7 +1134,7 @@ mod tests {
             .unwrap();
         let mut app = app(Some(hard));
         for _ in 0..3 {
-            app.demo_step();
+            app.step();
         }
         println!("{}", render(&app));
     }
