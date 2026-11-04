@@ -173,6 +173,8 @@ struct OpenerScore {
     within3: f64,
     /// Expected candidates left after the opener alone.
     left: f64,
+    /// Guesses needed for each answer, indexed by station.
+    lengths: Vec<usize>,
 }
 
 /// Every station as the opener against every station as the answer, with the
@@ -212,6 +214,7 @@ fn openers(net: &Network) {
                                 within2: share(2),
                                 within3: share(3),
                                 left: left(o),
+                                lengths,
                             }
                         })
                         .collect::<Vec<_>>()
@@ -279,6 +282,75 @@ fn openers(net: &Network) {
     {
         print!("out");
         row(s);
+    }
+    let modes: [(&str, std::ops::RangeInclusive<usize>); 4] = [
+        ("Tube", 0..=10),
+        ("DLR", 11..=11),
+        ("Elizabeth", 12..=12),
+        ("Overground", 13..=18),
+    ];
+    let on = |s: usize, lines: &std::ops::RangeInclusive<usize>| {
+        lines.clone().any(|l| net.stations[s].lines & (1 << l) != 0)
+    };
+    println!("\nbest opener on each mode");
+    header();
+    for (name, lines) in &modes {
+        if let Some(s) = scores.iter().find(|s| on(s.station, lines)) {
+            print!("{name}");
+            row(s);
+        }
+    }
+    println!("\nbest opener served only by each mode");
+    header();
+    for (name, lines) in &modes {
+        let mask: u32 = lines.clone().map(|l| 1u32 << l).sum();
+        if let Some(s) = scores
+            .iter()
+            .find(|s| net.stations[s.station].lines & !mask == 0)
+        {
+            print!("{name}");
+            row(s);
+        }
+    }
+    let best = &scores[0];
+    println!(
+        "\nhow hard each mode's stations are to find, opening with {}",
+        net.stations[best.station].name
+    );
+    let difficulty = |label: &str, answers: Vec<usize>| {
+        let k = answers.len() as f64;
+        let lens: Vec<usize> = answers.iter().map(|&a| best.lengths[a]).collect();
+        let mean = lens.iter().sum::<usize>() as f64 / k;
+        let slow = lens.iter().filter(|&&l| l >= 4).count() as f64 / k;
+        // Candidates left after the opener, averaged over answers: how much
+        // searching is still to do once the first clue is in.
+        let alive = answers
+            .iter()
+            .map(|&a| {
+                let f = solver::Feedback::compute(net, best.station, a);
+                (0..n)
+                    .filter(|&c| solver::Feedback::compute(net, best.station, c) == f)
+                    .count()
+            })
+            .sum::<usize>() as f64
+            / k;
+        println!(
+            "  {label:<14} {:>4} stations  {mean:>6.3} avg  {:>5.1}% need 4+  {alive:>6.1} left after opener",
+            answers.len(),
+            slow * 100.0
+        );
+    };
+    for (name, lines) in &modes {
+        difficulty(name, (0..n).filter(|&s| on(s, lines)).collect());
+    }
+    println!("\n  by line");
+    for l in 0..network::LINES.len() {
+        difficulty(
+            network::line_name(l),
+            (0..n)
+                .filter(|&s| net.stations[s].lines & (1 << l) != 0)
+                .collect(),
+        );
     }
     let mean_all = scores.iter().map(|s| s.mean).sum::<f64>() / n as f64;
     println!("\na random opener averages {mean_all:.3} guesses");
