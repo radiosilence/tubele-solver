@@ -1,0 +1,565 @@
+<title>Solving Tubele</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Version-space search on the London rail graph: how tubele-solver plays Tubele, with interactive figures.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&display=swap">
+<style>
+/* Layout: a single reading column of ~66ch with figures that break out to a
+   wide measure; numbered sections because the argument is sequential. */
+:root {
+  --bg: #f3f4f6;
+  --panel: #ffffff;
+  --ink: #12151b;
+  --ink-2: #474d59;
+  --muted: #6b7180;
+  --rule: #d6d9e0;
+  --faint: #c3c7d0;
+  --accent: #0019a8;
+  --signal: #dc241f;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --q1: #cde2fb; --q2: #9ec5f4; --q3: #6da7ec; --q4: #3987e5; --q5: #256abf; --q6: #184f95; --q7: #0d366b;
+  --l0:#b36305;--l1:#e32017;--l2:#e2b700;--l3:#00782a;--l4:#e895ab;--l5:#868b8f;--l6:#9b0056;--l7:#1d1d1b;--l8:#003688;--l9:#0098d4;--l10:#5fae96;--l11:#00a4a7;--l12:#6950a1;--l13:#5d6061;--l14:#e8920a;--l15:#0077ad;--l16:#4aa864;--l17:#823a62;--l18:#ef3340;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --text: 40rem;
+  --wide: 72rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1015; --panel: #161920; --ink: #e8eaef; --ink-2: #b9bfcb; --muted: #8d94a3; --rule: #272b35; --faint: #343946;
+    --accent: #7d93ff; --signal: #ff5b50;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+    --q1: #12284a; --q2: #133f78; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #c4dcf8;
+    --l0:#d98a2b;--l1:#f0463d;--l2:#ffd300;--l3:#2fb35a;--l4:#f3a9bb;--l5:#a0a5a9;--l6:#d0418d;--l7:#d4d4d4;--l8:#5a83e6;--l9:#2fb4ea;--l10:#95cdba;--l11:#20c4c7;--l12:#9a84d6;--l13:#9a9d9e;--l14:#faa61a;--l15:#2e9fd6;--l16:#5bbd72;--l17:#b8628f;--l18:#ff5866;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1015; --panel: #161920; --ink: #e8eaef; --ink-2: #b9bfcb; --muted: #8d94a3; --rule: #272b35; --faint: #343946;
+  --accent: #7d93ff; --signal: #ff5b50;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --q1: #12284a; --q2: #133f78; --q3: #1c5cab; --q4: #2a78d6; --q5: #5598e7; --q6: #86b6ef; --q7: #c4dcf8;
+  --l0:#d98a2b;--l1:#f0463d;--l2:#ffd300;--l3:#2fb35a;--l4:#f3a9bb;--l5:#a0a5a9;--l6:#d0418d;--l7:#d4d4d4;--l8:#5a83e6;--l9:#2fb4ea;--l10:#95cdba;--l11:#20c4c7;--l12:#9a84d6;--l13:#9a9d9e;--l14:#faa61a;--l15:#2e9fd6;--l16:#5bbd72;--l17:#b8628f;--l18:#ff5866;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font: 400 1.0625rem/1.62 var(--body);
+  font-optical-sizing: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 6rem;
+  -webkit-font-smoothing: antialiased;
+}
+.text, .wide { margin-inline: auto; }
+.text { max-width: var(--text); }
+.wide { max-width: var(--wide); }
+p { margin: 0 0 1em; text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: .15em; }
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 1.6rem; font-weight: 800; font-stretch: 88%; margin: 3.2rem 0 .8rem; display: flex; gap: .6rem; align-items: baseline; }
+h2 .n { font-family: var(--mono); font-size: .95rem; font-weight: 500; color: var(--signal); }
+h3 { font-size: 1.08rem; font-weight: 750; font-stretch: 95%; margin: 2rem 0 .5rem; }
+em { font-style: italic; }
+code, .mono { font-family: var(--mono); font-size: .86em; }
+.tab { font-variant-numeric: tabular-nums; }
+
+/* Masthead */
+header.mast { padding-block: 3.5rem 1.5rem; }
+.kicker { font-family: var(--mono); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.roundels { display: flex; gap: .3rem; margin: 1.1rem 0 1rem; flex-wrap: wrap; }
+.roundels span {
+  width: 2.6rem; height: 2.6rem; border-radius: 50%; border: .32rem solid var(--ink); background: var(--panel);
+  display: grid; place-items: center; font: 900 1.1rem/1 var(--display); color: var(--ink);
+}
+.roundels span.hit { border-color: var(--signal); }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: .98; font-weight: 900; font-stretch: 78%; margin: 0 0 .9rem; }
+.sub { font-size: 1.25rem; color: var(--ink-2); max-width: 40rem; font-style: italic; }
+.byline { display: flex; flex-wrap: wrap; gap: .4rem 1.6rem; margin-top: 1.4rem; font-family: var(--mono); font-size: .8rem; color: var(--muted); border-top: 1px solid var(--rule); padding-top: .8rem; }
+.abstract { border-left: 3px solid var(--accent); padding: .2rem 0 .2rem 1.1rem; margin: 1.6rem 0 0; }
+.abstract b { font-family: var(--display); font-weight: 800; font-size: .8rem; letter-spacing: .08em; text-transform: uppercase; display: block; color: var(--muted); margin-bottom: .2rem; }
+
+/* Figures */
+figure { margin: 2.2rem auto; }
+.fig { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 1rem; }
+figcaption { font-size: .9rem; line-height: 1.5; color: var(--ink-2); margin-top: .7rem; max-width: var(--text); }
+figcaption b { font-family: var(--display); font-weight: 800; color: var(--ink); }
+.controls { display: flex; flex-wrap: wrap; gap: .5rem .6rem; align-items: center; margin-bottom: .8rem; font-family: var(--mono); font-size: .8rem; }
+.controls label { color: var(--muted); display: flex; gap: .35rem; align-items: center; }
+select, button, input[type="search"] {
+  font: 500 .8rem/1 var(--mono); color: var(--ink); background: var(--bg); border: 1px solid var(--faint);
+  border-radius: 4px; padding: .45rem .6rem; min-height: 2rem;
+}
+select { max-width: 14rem; }
+button { cursor: pointer; }
+button.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+button:disabled { opacity: .45; cursor: default; }
+.split { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 1rem; align-items: start; }
+@media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.mapbox { position: relative; border: 1px solid var(--rule); border-radius: 4px; background: var(--bg); overflow: hidden; }
+.mapbox svg { display: block; width: 100%; height: auto; touch-action: none; cursor: grab; }
+.maptools { position: absolute; right: .5rem; top: .5rem; display: flex; gap: .3rem; }
+.maptools button { padding: .3rem .5rem; min-height: 1.7rem; background: var(--panel); }
+.stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin-bottom: .8rem; }
+.stat { border: 1px solid var(--rule); border-radius: 4px; padding: .45rem .6rem; }
+.stat .k { font: 500 .68rem/1.2 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stat .v { font: 800 1.35rem/1.2 var(--display); font-stretch: 85%; font-variant-numeric: tabular-nums; }
+.stat .v small { font: 400 .75rem var(--mono); color: var(--muted); margin-left: .25rem; }
+.panel-title { font: 700 .72rem/1.3 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin: .7rem 0 .35rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .25rem; max-height: 9rem; overflow: auto; font: .74rem/1.3 var(--mono); }
+.chips span { border: 1px solid var(--faint); border-radius: 3px; padding: .1rem .35rem; }
+.chips span.ans { border-color: var(--signal); color: var(--signal); }
+table { border-collapse: collapse; width: 100%; font-size: .84rem; }
+th, td { text-align: left; padding: .32rem .5rem; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font: 600 .7rem/1.2 var(--mono); letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: .8rem; }
+.scroll { overflow-x: auto; }
+.log td { font-family: var(--mono); font-size: .76rem; }
+.swatch { display: inline-block; width: .7rem; height: .7rem; border-radius: 2px; vertical-align: -.05rem; margin-right: .35rem; }
+.legend { display: flex; flex-wrap: wrap; gap: .3rem 1rem; font: .76rem/1.3 var(--mono); color: var(--ink-2); margin: .3rem 0 .6rem; }
+.def, .prop, .note { margin: 1.4rem 0; padding: .9rem 1.1rem; border-radius: 4px; }
+.def { background: var(--panel); border: 1px solid var(--rule); }
+.prop { background: var(--panel); border: 1px solid var(--rule); border-left: 3px solid var(--accent); }
+.def > b:first-child, .prop > b:first-child { font-family: var(--display); font-weight: 800; font-size: .92rem; margin-right: .35rem; }
+.proof { font-size: .95rem; color: var(--ink-2); margin-top: .5rem; }
+.proof::after { content: "∎"; float: right; color: var(--muted); }
+.note { border: 1px dashed var(--faint); font-size: .95rem; }
+.pending { border: 1px dashed var(--signal); border-radius: 4px; padding: .8rem 1rem; font-family: var(--mono); font-size: .8rem; color: var(--ink-2); }
+.pending b { color: var(--signal); }
+.tip { position: fixed; z-index: 20; pointer-events: none; background: var(--panel); color: var(--ink); border: 1px solid var(--faint); border-radius: 4px; padding: .4rem .55rem; font: .74rem/1.4 var(--mono); max-width: 22rem; box-shadow: 0 6px 20px rgb(0 0 0 / .18); }
+.axis text { font: 10.5px var(--mono); fill: var(--muted); }
+.axis path, .axis line { stroke: var(--faint); }
+.grid line { stroke: var(--rule); }
+.refs { font-size: .9rem; color: var(--ink-2); padding-left: 1.2rem; }
+.refs li { margin-bottom: .4rem; }
+mjx-container { color: var(--ink); }
+mjx-container[display="true"] { overflow-x: auto; overflow-y: hidden; padding-block: .2rem; }
+.icicle text { font: 10px var(--mono); fill: var(--ink); pointer-events: none; }
+details summary { cursor: pointer; font: .78rem var(--mono); color: var(--muted); margin-top: .6rem; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+/* Gallery layer: full-bleed hero, exhibit plaques, rolling stock. */
+.hero { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); background: var(--panel); border-block: 1px solid var(--rule); position: relative; }
+.hero .mapbox { border: 0; border-radius: 0; background: transparent; }
+.hero-cap { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: .8rem; font: .72rem/1.3 var(--mono); color: var(--muted); background: color-mix(in oklab, var(--panel) 80%, transparent); padding: .25rem .5rem; border-radius: 3px; }
+.exhibit { margin: 2.4rem auto; }
+.exhibit > .plate { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline; margin-bottom: .55rem; }
+.exhibit .no { font: 600 .72rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--signal); }
+.exhibit .label { font: 800 1.08rem/1.2 var(--display); font-stretch: 90%; }
+.exhibit .plaque { font-size: .92rem; line-height: 1.55; color: var(--ink-2); margin-top: .7rem; max-width: 46rem; }
+.toggle { display: inline-flex; border: 1px solid var(--faint); border-radius: 4px; overflow: hidden; }
+.toggle button { border: 0; border-radius: 0; background: var(--bg); }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem; }
+.stock > div { border: 1px solid var(--rule); border-radius: 4px; padding: .7rem .8rem; background: var(--bg); }
+.stock svg { width: 100%; height: 3.2rem; display: block; margin-bottom: .4rem; }
+.stock b { font-family: var(--display); font-weight: 800; }
+.stock span { display: block; font: .74rem/1.4 var(--mono); color: var(--muted); }
+.contrib { padding-left: 1.2rem; }
+.contrib li { margin-bottom: .45rem; }
+.notation td:first-child { white-space: nowrap; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .6rem; }
+.multiples figure { margin: 0; border: 1px solid var(--rule); border-radius: 4px; padding: .3rem; background: var(--bg); }
+.multiples figcaption { margin: .2rem .2rem 0; font: .72rem/1.35 var(--mono); color: var(--ink-2); }
+.multiples canvas { width: 100%; height: auto; display: block; }
+.multiples figure.on { border-color: var(--signal); }
+input[type="range"] { accent-color: var(--signal); }
+.algo { background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: .8rem 1rem; font: .8rem/1.55 var(--mono); white-space: pre; overflow-x: auto; }
+.livemath { min-height: 3.5rem; }
+.th-sort { cursor: pointer; user-select: none; }
+.th-sort[aria-sort="ascending"]::after { content: " ▲"; }
+.th-sort[aria-sort="descending"]::after { content: " ▼"; }
+.tablebox { max-height: 28rem; overflow: auto; border: 1px solid var(--rule); border-radius: 4px; }
+.tablebox thead th { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+tr.sel td { background: color-mix(in oklab, var(--signal) 12%, transparent); }
+.kbd { font: .72rem var(--mono); border: 1px solid var(--faint); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3rem; }
+.text .wide { width: min(var(--wide), calc(100vw - 2 * max(16px, env(safe-area-inset-left, 0px)))); max-width: none; margin-left: 50%; transform: translateX(-50%); }
+@media (max-width: 640px) {
+  .hero svg { height: 62vh; min-height: 340px; width: 100%; }
+  .hero-cap { position: static; display: block; margin: .5rem max(16px, env(safe-area-inset-left, 0px)); }
+}
+</style>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <!-- Original rolling-stock silhouettes, 40 units long, facing right, centred on the origin. -->
+    <symbol id="t-tube" viewBox="-22 -7 44 14"><path d="M-20 5 L-20 -1 Q-20 -6 -12 -6 L12 -6 Q20 -6 20 -1 L20 5 Z" fill="currentColor"/><g style="fill:var(--panel)"><rect x="-15" y="-3.5" width="4" height="3" rx="1"/><rect x="-8" y="-3.5" width="4" height="3" rx="1"/><rect x="-1" y="-3.5" width="4" height="3" rx="1"/><rect x="6" y="-3.5" width="4" height="3" rx="1"/><rect x="13" y="-3.5" width="4" height="3.5" rx="1.2"/></g><g style="fill:var(--ink)"><circle cx="-13" cy="6" r="1.6"/><circle cx="13" cy="6" r="1.6"/></g></symbol>
+    <symbol id="t-dlr" viewBox="-24 -8 48 16"><path d="M-22 6 L-22 -4 Q-22 -6 -19 -6 L-1.5 -6 L-1.5 6 Z M1.5 6 L1.5 -6 L17 -6 Q22 -6 22 0 L22 6 Z" fill="currentColor"/><rect x="-1.5" y="-4" width="3" height="9" fill="currentColor" opacity=".55"/><g style="fill:var(--panel)"><rect x="-18" y="-3.5" width="5" height="3.5" rx=".8"/><rect x="-10" y="-3.5" width="5" height="3.5" rx=".8"/><rect x="4" y="-3.5" width="5" height="3.5" rx=".8"/><path d="M13 -4 L18 -4 Q20.5 -4 20.5 -1 L20.5 1 L13 1 Z"/></g><g style="fill:var(--ink)"><circle cx="-16" cy="7" r="1.5"/><circle cx="0" cy="7" r="1.5"/><circle cx="16" cy="7" r="1.5"/></g></symbol>
+    <symbol id="t-over" viewBox="-26 -7 52 14"><path d="M-25 5 L-25 -4 Q-25 -5.5 -23 -5.5 L22 -5.5 Q25 -5.5 25 -2 L25 5 Z" fill="currentColor"/><g style="fill:var(--panel)"><rect x="-21" y="-3.5" width="6" height="3" rx=".6"/><rect x="-12" y="-3.5" width="6" height="3" rx=".6"/><rect x="-3" y="-3.5" width="6" height="3" rx=".6"/><rect x="6" y="-3.5" width="6" height="3" rx=".6"/><rect x="16" y="-3.5" width="6.5" height="3" rx=".6"/></g><rect x="-25" y="1.5" width="50" height="1" style="fill:var(--panel)" opacity=".6"/><g style="fill:var(--ink)"><circle cx="-19" cy="6" r="1.5"/><circle cx="-13" cy="6" r="1.5"/><circle cx="13" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/></g></symbol>
+    <symbol id="t-liz" viewBox="-30 -7 60 14"><path d="M-29 5 L-29 -3 Q-29 -5.5 -26 -5.5 L18 -5.5 Q24 -5.5 29 2 L29 5 Z" fill="currentColor"/><g style="fill:var(--panel)"><rect x="-25" y="-3.6" width="9" height="3" rx="1"/><rect x="-13" y="-3.6" width="9" height="3" rx="1"/><rect x="-1" y="-3.6" width="9" height="3" rx="1"/><path d="M11 -3.6 L19 -3.6 Q22 -3.6 25 0 L11 0 Z"/></g><g style="fill:var(--ink)"><circle cx="-23" cy="6" r="1.5"/><circle cx="-17" cy="6" r="1.5"/><circle cx="17" cy="6" r="1.5"/><circle cx="23" cy="6" r="1.5"/></g></symbol>
+  </defs>
+</svg>
+
+<header class="mast text">
+  <div class="kicker">tubele-solver · technical report and gallery · <span data-v="built"></span></div>
+  <div class="roundels" aria-hidden="true"><span>T</span><span>U</span><span>B</span><span>E</span><span>L</span><span class="hit">E</span></div>
+  <h1>Solving Tubele by version-space search on the London rail graph</h1>
+  <p class="sub">Adaptive identification of one station among 420, with an exact consistency filter, a collision-entropy objective, counting lower bounds it nearly meets, and a comparison with 13,030 human games.</p>
+  <div class="byline"><span>Code: github.com/radiosilence/tubele-solver</span><span>Game: tubele.app by Mike Keefe</span><span>Data from TfL Open Data</span></div>
+</header>
+
+<section class="hero" aria-label="The network, with trains running">
+  <div class="mapbox" id="mapHero"></div>
+  <div class="hero-cap">Exhibit 0 · the network as the solver sees it: <span data-v="n"></span> stations, <span data-v="m"></span> edges, 19 lines. Trains run their own lines; hover any station.</div>
+</section>
+
+<main class="text">
+
+<div class="abstract">
+  <b>Abstract</b>
+  Tubele asks a player to identify a hidden station on London's Underground, Overground, DLR and Elizabeth line networks in at most six guesses. Each guess is answered with the shortest-path distance in stops, a fare-zone comparison and the set of shared lines, and the game additionally reveals one of the answer's transport modes at the start and one further property after each wrong guess. We formalise the game as adaptive identification over a finite hypothesis space under a guess-dependent partition, build the network independently from TfL Open Data, and analyse a policy that maintains the exact version space and chooses each guess to minimise the expected size of the next one, which we show equals $|C|\,2^{-H_2}$ for the Rényi collision entropy $H_2$ of the induced partition. Over all <span data-v="nn"></span> (opener, answer) pairs the policy never needs more than five guesses on the map alone and averages <span data-v="best.mean"></span> from its best opener, within <span data-v="best.gap"></span> of a second-order counting lower bound for that opener; no policy can average below <span data-v="glb"></span>. With the progressive clues, the reference implementation averages 2.264 guesses with a worst case of four, and the re-implementation used for this report <span data-v="ad.mean"></span> with a worst case of <span data-v="ad.worst"></span>, against an information bound of <span data-v="cb"></span>. Players of the live game, who see the same clues, win 80.7% of daily games and 73.1% of practice games; fitted to a constant-information survival model they extract about <span data-v="hp.b"></span> bits per guess, against the <span data-v="log2n"></span> bits needed.
+</div>
+
+<h3>Contributions</h3>
+<ol class="contrib">
+  <li>A formal model of Tubele (§2) as identification under a deterministic feedback function with values in $\Phi = \mathbb{N}\times\{\textsf{exact},\textsf{near},\textsf{none}\}\times 2^{\Lambda}$, extended with revealed clue functions $\kappa_j$.</li>
+  <li>An independent construction of the station graph from TfL Open Data that reproduces the game's diameter (§3), with a soft-consistency fallback for graph drift.</li>
+  <li>A proof that the greedy objective is the collision probability of the feedback partition, $\mathbb{E}|C'| = |C|\,2^{-H_2} - [g\in C]/|C|$ (Theorem 1), and two lower bounds on expected guesses: an information bound and a sharper second-order counting bound (§4).</li>
+  <li>Complete results for every opener, with and without clues, by mode and by line, and the full decision trees (§6).</li>
+  <li>A comparison with 13,030 recorded human games, including a maximum-likelihood estimate of human information per guess (§7).</li>
+</ol>
+
+<h3>Notation</h3>
+<div class="scroll"><table class="notation">
+<tbody>
+<tr><td>$G=(V,E)$</td><td>station graph; $n=|V|=<span data-v="n"></span>$, $|E|=<span data-v="m"></span>$</td></tr>
+<tr><td>$\Lambda$, $L(v)$</td><td>the 19 lines; the lines serving station $v$</td></tr>
+<tr><td>$Z(v)$</td><td>fare zones of $v$ ($\varnothing$ outside the zonal system)</td></tr>
+<tr><td>$d(u,v)$</td><td>hop distance in $G$, interchange cost $0$</td></tr>
+<tr><td>$f(g,a)\in\Phi$</td><td>feedback for guess $g$ and answer $a$</td></tr>
+<tr><td>$\kappa_j : V \to \Sigma_j$</td><td>clue $j$ ($j=0$ mode, then zone, role, line, end distance, initial)</td></tr>
+<tr><td>$C_t$</td><td>version space after $t$ guesses</td></tr>
+<tr><td>$\pi_g(C)$, $W_g$</td><td>partition of $C$ by $f(g,\cdot)$; its win block $\{g\}\cap C$</td></tr>
+<tr><td>$H_1$, $H_2$</td><td>Shannon and Rényi-2 (collision) entropies of a partition, in bits</td></tr>
+<tr><td>$T$</td><td>number of guesses used; $\mathbb{E}[T]$ under the uniform prior</td></tr>
+</tbody></table></div>
+
+<h2><span class="n">1</span>Introduction</h2>
+
+<p>Tubele is a daily puzzle in the family of Wordle: one hidden answer, a small budget of guesses, structured feedback after each. Its answer space is the 420 stations of four London rail networks and its feedback is geometric. A guess reports how many stops separate it from the answer along the network, whether its fare zone matches, and which of its lines also serve the answer. Unlike Wordle, whose feedback alphabet is fixed at $3^5$, Tubele's alphabet is induced by the graph: a guess's power to discriminate depends on where it sits, how many lines meet there, and how the network fans out around it. The question this report answers is how well a machine that knows only the map, and plays only through the game's own interface, can do, and how that compares with people.</p>
+
+<p>The solver (<code>src/solver.rs</code>) is short. Its interest lies in the analysis: why a one-step greedy rule is so close to optimal on this graph, which openers are best and why, what the progressive clues are worth, and where human play loses its efficiency. Every number in this report is computed from the network on the page or in a build step from the same code, and every figure is interactive. Click a station on any map to make it the subject of every linked figure.</p>
+
+<section class="exhibit wide" id="ex-stock">
+  <div class="plate"><span class="no">Exhibit 1</span><span class="label">Rolling stock</span></div>
+  <div class="fig"><div class="stock" id="stock"></div></div>
+  <p class="plaque">The four modes the game covers, each drawn as an original silhouette and counted by the stations it serves in the solver's graph. A station on several modes counts once per mode. The trains on this page run only on their own mode's lines and take each line's colour.</p>
+</section>
+
+<h2><span class="n">2</span>Model</h2>
+
+<div class="def"><b>Definition 1 (network).</b> $G=(V,E)$ is a connected undirected graph with a labelling $\lambda : E \to 2^{\Lambda}\setminus\{\varnothing\}$ of the lines running each hop. $L(v) = \bigcup_{e\ni v}\lambda(e)$. $Z(v)\subset\mathbb{N}$. $d$ is the shortest-path metric of $G$ with unit edge weights.</div>
+
+<div class="def"><b>Definition 2 (feedback).</b> $f(g,a) = \big(d(g,a),\ \zeta(g,a),\ L(g)\cap L(a)\big)$ with $\zeta(g,a)=\textsf{exact}$ if $Z(g)\cap Z(a)\ne\varnothing$ or $Z(g)=Z(a)=\varnothing$; $\textsf{near}$ if $\exists z\in Z(g): z\pm1\in Z(a)$; $\textsf{none}$ otherwise. The guess wins iff $d(g,a)=0$.</div>
+
+<div class="def"><b>Definition 3 (clues).</b> The game reveals $\kappa_0(a)$, one of the answer's modes, before the first guess, and $\kappa_j(a)$ after the $j$-th wrong guess for $j=1,\dots,5$: fare zone, role, one of its lines, stops from that line's end, initial letter. Appendix B gives exact definitions.</div>
+
+<div class="def"><b>Definition 4 (version space).</b> After guesses $g_1..g_t$ with observations $\varphi_i$, of which $w$ were wrong, and revealed clues $c_0..c_w$,
+$$C_t = \{a \in V : f(g_i,a)=\varphi_i\ \forall i\le t\}\ \cap\ \bigcap_{j=0}^{w}\{a : \kappa_j(a) = c_j\}.$$
+The prior on the answer is uniform on $V$.</div>
+
+<div class="prop"><b>Lemma 1 (exactness).</b> If the solver's $G$ equals the game's, then $a\in C_t$ for all $t$, the sequence $|C_t|$ is non-increasing, and the posterior on $C_t$ is uniform.
+<div class="proof">The answer satisfies every observation and clue by definition, so it survives every intersection. Intersections only remove elements. The posterior is the prior restricted to the event $\{a\in C_t\}$, and the prior is uniform.</div></div>
+
+<div class="prop"><b>Lemma 2 (trilateration).</b> For any guesses $g_1,g_2$ and any candidate $a$, $|d(g_1,a)-d(g_2,a)| \le d(g_1,g_2)$. Consequently two observations $d_1,d_2$ are jointly consistent only if $|d_1-d_2|\le d(g_1,g_2)$, and the candidates consistent with both lie in the intersection of two metric spheres $S(g_1,d_1)\cap S(g_2,d_2)$, which is small when $g_1$ and $g_2$ are far apart relative to $d_1,d_2$.
+<div class="proof">$d$ is a metric, so the triangle inequality gives $d(g_1,a)\le d(g_1,g_2)+d(g_2,a)$ and symmetrically. The second claim restates the first for the observed values.</div></div>
+
+<p>Lemma 2 is why the solver's second guess is usually far from its first. A second guess near the first produces distances that differ by at most a few stops for every candidate, so it repeats information the first already gave. Exhibit 3 shows the spheres $S(g,d)$ directly: each colour band of the distance map is one of them.</p>
+
+<p><b>Prior.</b> The uniform prior is exact for the game's practice mode, which draws uniformly from all stations except the next seven daily answers, and deliberately ignorant for daily puzzles, which follow a curated schedule. The solver never reads the schedule or the game's difficulty tiers.</p>
+
+<h2><span class="n">3</span>The network and methods</h2>
+
+<p><b>Construction.</b> <code>tubele-solver fetch</code> (<code>src/network.rs</code>) builds $G$ from two TfL Unified API endpoints per line: <code>Line/{id}/StopPoints</code> for stations and zones, and <code>Line/{id}/Route/Sequence/all</code> for ordered stop sequences, whose consecutive pairs become edges labelled with the line. Stop points merge into one station when their cleaned names are equal after normalisation and they lie within 600 m; the two Edgware Roads and the two Hammersmiths never merge. Zones parse every integer in TfL's zone string, so <em>2+3</em> and <em>2/3</em> both give $\{2,3\}$. The graph is checked for connectivity and embedded at compile time.</p>
+
+<p><b>Distances.</b> All-pairs hop distances come from one breadth-first search per source, $O(n(n+|E|))$ time and an $n\times n$ byte matrix, $<span data-v="nnk"></span>$ entries. The diameter is <span data-v="diam"></span>, which matches the diameter the game's own build reports for its independently built graph; agreement on this extremal statistic over all $\binom{n}{2}$ pairs is strong evidence the graphs coincide.</p>
+
+<section class="exhibit wide" id="ex-zones">
+  <div class="plate"><span class="no">Exhibit 2</span><span class="label">Zones and lines</span></div>
+  <div class="fig"><div class="mapbox" id="mapZones"></div></div>
+  <p class="plaque">Fare zones as soft bands under the line network. The zone component of the feedback compares these bands: <em>exact</em> when the guess and the answer share a zone, <em>near</em> when they are one zone apart. Because zones are roughly concentric, the zone component is strongly correlated with distance from the centre and adds little beyond the stop count for central guesses, but it separates the radial branches well.</p>
+</section>
+
+<section class="exhibit wide" id="ex-dist">
+  <div class="plate"><span class="no">Exhibit 3</span><span class="label">Distance from one station</span>
+    <span class="controls" style="margin:0"><label for="distsrc">source <select id="distsrc"></select></label><button type="button" id="distplay">run trains out</button></span></div>
+  <div class="fig">
+    <div class="split">
+      <div class="mapbox" id="mapDist"></div>
+      <div>
+        <div class="panel-title">stations at each distance from the source</div>
+        <svg id="distshell" role="img" aria-label="Stations at each distance"></svg>
+        <div class="panel-title">all ordered pairs</div>
+        <svg id="disthist" role="img" aria-label="Distribution of all pairwise distances"></svg>
+      </div>
+    </div>
+  </div>
+  <p class="plaque">A breadth-first search from the selected station, drawn as a choropleth: each colour is one metric sphere $S(g,k)=\{v:d(g,v)=k\}$, the set of answers that would produce the reading $k$. Press the button to watch the search expand one hop per tick, with a train leaving along each tree edge. The histogram on the right is the shell profile $|S(g,k)|$; a flatter, wider profile means the distance reading alone splits the stations into more, smaller classes. Below it, the distribution over all <span data-v="pairs"></span> ordered pairs.</p>
+</section>
+
+<section class="exhibit wide" id="ex-mat">
+  <div class="plate"><span class="no">Exhibit 4</span><span class="label">The distance matrix</span>
+    <span class="controls" style="margin:0"><label for="matorder">order <select id="matorder"><option value="bfs">breadth-first from Bank</option><option value="lon">longitude</option><option value="line">first line, then longitude</option></select></label></span></div>
+  <div class="fig"><canvas id="matrix" width="420" height="420" style="width:min(100%,560px);aspect-ratio:1;image-rendering:pixelated;display:block;margin-inline:auto;border:1px solid var(--rule)"></canvas></div>
+  <p class="plaque">$D_{uv}=d(u,v)$ as a 420 × 420 image, darker for further. Every guess reveals one row of this matrix at one column, coarsened by the zone and line components. Under breadth-first ordering the radial lines appear as bands.</p>
+</section>
+
+<p><b>Consistency under drift.</b> The solver's graph and the game's are built independently and TfL changes routes, so the solver replaces the consistency indicator with a penalty and keeps its minimisers:
+$$\rho(v) = \sum_{i\le t}\Big(|d(g_i,v)-d_i| + 3[\zeta(g_i,v)\ne\zeta_i] + 3\,\big|(L(g_i)\cap L(v))\,\triangle\,S_i\big|\Big) + 3\sum_{j\le w}[\kappa_j(v)\ne c_j],\qquad C_t=\arg\min_v \rho(v).$$
+When some station is fully consistent the minimum is $0$ and this is Definition 4 exactly. Otherwise the solver degrades gracefully to the stations that disagree least, and its interface says so. In every live game played for this report the minimum was $0$.</p>
+
+<h2><span class="n">4</span>Choosing a guess</h2>
+
+<p>For a candidate set $C$ and any station $g$ (candidate or not), write $p_B = |B|/|C|$ for the blocks $B\in\pi_g(C)$, the probability under the uniform posterior that the answer falls in $B$. Three summaries of the partition matter:</p>
+$$H_1(g) = -\sum_B p_B\log_2 p_B,\qquad H_2(g) = -\log_2\sum_B p_B^2,\qquad \operatorname{worst}(g)=\max_{B\ne W_g}|B|.$$
+
+<div class="prop"><b>Theorem 1 (the greedy objective is collision probability).</b> Let $C'$ be the version space after guessing $g$, counting a correct guess as leaving $0$ candidates. Then
+$$\mathbb{E}\,|C'| \;=\; \sum_{B\ne W_g}\frac{|B|^2}{|C|} \;=\; |C|\,2^{-H_2(g)} - \frac{[g\in C]}{|C|}.$$
+<div class="proof">The answer lies in block $B$ with probability $|B|/|C|$, and then $C'=B$, except for the win block, which leaves nothing. So $\mathbb{E}|C'| = \sum_{B\ne W_g}(|B|/|C|)|B|$. Adding and subtracting the win block, of size $1$ when $g\in C$, gives $\sum_B|B|^2/|C| - [g\in C]/|C| = |C|\sum_B p_B^2 - [g\in C]/|C|$, and $\sum_B p_B^2 = 2^{-H_2}$ by definition.</div></div>
+
+<p>Minimising $\mathbb{E}|C'|$ is therefore, up to the win correction, maximising Rényi-2 entropy, the negative log of the probability that two independent draws from the posterior land in the same block. Since $H_2\le H_1$ with equality only for uniform partitions, the collision objective penalises a single large block more heavily than Shannon entropy does: a partition with one block of 40 and a hundred singletons has high $H_1$ but leaves a 40-candidate tail with substantial probability. Expected search depth is driven by exactly those tails, because a block of size $k$ costs roughly $\log_b k$ further guesses in a game with branching $b$ and the expectation weights it by $k/|C|$. The win correction is what lets a candidate guess, which might end the game, compete fairly with a non-candidate that splits better.</p>
+
+<p><b>Policy.</b> <code>solver::rank</code> computes, for each unguessed station, the partition of $C$ by feedback in one pass with a hash map, and orders stations by $\mathbb{E}|C'|$ ascending, then candidates before non-candidates, then $H_1$ descending, then index. For $|C|\le2$ it guesses a candidate. One decision costs $\Theta(n|C|)$ feedback evaluations; the first, with $C=V$, costs $n^2$.</p>
+
+<section class="exhibit wide" id="fig-step">
+  <div class="plate"><span class="no">Exhibit 5</span><span class="label">The solver at work</span></div>
+  <div class="fig">
+    <div class="controls">
+      <label for="ans">answer <select id="ans"></select></label>
+      <button id="ans-rand" type="button">random</button>
+      <label for="opn">opener <select id="opn"></select></label>
+      <span class="toggle" role="group" aria-label="Clues"><button type="button" id="clu-off" aria-pressed="true">map only</button><button type="button" id="clu-on" aria-pressed="false">with panel</button></span>
+      <button id="step" class="primary" type="button">guess</button>
+      <button id="play" type="button">play</button>
+      <button id="reset" type="button">reset</button>
+    </div>
+    <div class="split">
+      <div class="mapbox" id="map1"></div>
+      <div>
+        <div class="stats">
+          <div class="stat"><div class="k">candidates |C|</div><div class="v" id="s-c"></div></div>
+          <div class="stat"><div class="k">uncertainty</div><div class="v" id="s-h"></div></div>
+          <div class="stat"><div class="k">next guess</div><div class="v" id="s-g" style="font-size:1.05rem"></div></div>
+          <div class="stat"><div class="k">panel</div><div class="v" id="s-p" style="font-size:.8rem;font-family:var(--mono);font-weight:400"></div></div>
+        </div>
+        <div class="panel-title">partition of C by the next guess</div>
+        <svg id="part1" viewBox="0 0 400 46" style="width:100%;height:auto;display:block" role="img" aria-label="Partition of the candidate set"></svg>
+        <div class="panel-title">Theorem 1, evaluated</div>
+        <div class="livemath" id="live1"></div>
+        <div class="panel-title">history</div>
+        <div class="scroll"><table class="log"><thead><tr><th>#</th><th>guess</th><th>feedback</th><th class="n">|C′|</th><th class="n">bits</th></tr></thead><tbody id="log"></tbody></table></div>
+      </div>
+    </div>
+  </div>
+  <p class="plaque">One game, step by step. Candidates are shaded by their distance from the next guess, so the shading is the distance component of the partition drawn on the map; the block that will occur is ringed in red, and the bar above shows every block's size. With the panel on, each wrong guess also applies the next clue. When the answer is found, a train runs the shortest path from each earlier guess to it. Selecting a station on any map makes it this game's opener.</p>
+</section>
+
+<section class="exhibit wide" id="ex-sandbox">
+  <div class="plate"><span class="no">Exhibit 6</span><span class="label">Your guess against the solver's</span></div>
+  <div class="fig">
+    <div class="controls"><label for="yours">your guess <input type="search" id="yours" list="stationlist" placeholder="type a station" autocomplete="off"></label><datalist id="stationlist"></datalist><span style="color:var(--muted)">scored against the candidates in Exhibit 5</span></div>
+    <div class="scroll"><table id="sandtable"></table></div>
+    <div class="livemath" id="live2" style="margin-top:.6rem"></div>
+  </div>
+  <p class="plaque">Type any station to score it as the next guess in the current state of Exhibit 5. The table compares it with the solver's choice on all four criteria; the formula substitutes its numbers into Theorem 1.</p>
+</section>
+
+<section class="exhibit wide" id="ex-mult">
+  <div class="plate"><span class="no">Exhibit 7</span><span class="label">The candidate set, guess by guess</span>
+    <span class="controls" style="margin:0"><label for="multscrub">guess <input type="range" id="multscrub" min="0" max="5" value="0" step="1"></label><span id="multlabel" class="mono"></span></span></div>
+  <div class="fig"><div class="multiples" id="multiples"></div></div>
+  <p class="plaque">Small multiples of the game in Exhibit 5: one map per guess, the surviving candidates in ink and the guess in red. Scrub to highlight a step.</p>
+</section>
+
+<h3>Lower bounds</h3>
+
+<div class="prop"><b>Proposition 1 (information bound).</b> Let $b=\max_{g}|\pi_g(V)\setminus\{W_g\}|$ be the largest number of non-win blocks any single guess induces on $V$. Any policy identifies at most $1+b+\dots+b^{t-1}$ answers within $t$ guesses, so
+$$\mathbb{E}[T]\ \ge\ \frac1n\sum_{t\ge1} t\cdot\Big(\min\big(n,\textstyle\sum_{s\lt t}b^s\big)-\min\big(n,\sum_{s\lt t-1}b^s\big)\Big).$$
+On this network $b=<span data-v="bmax"></span>$, giving $\mathbb{E}[T]\ge <span data-v="ib"></span>$.
+<div class="proof">A decision tree in which each internal node has at most $b$ non-win children and one win leaf has at most $b^{t-1}$ nodes at depth $t$, each resolving at most one answer by a correct guess. Partitions of a subset have no more blocks than partitions of the whole set, so $b$ bounds every node. Filling depths greedily minimises $\sum_a T(a)$ subject to these caps.</div></div>
+
+<p>This is the $\log_{|\Phi_{\text{eff}}|}n$ bound made exact for small depths: with $b=<span data-v="bmax"></span>$ effective feedback values, $\log_b n = <span data-v="logbn"></span>$, so most answers need at least three guesses. It ignores that blocks after the first guess are small and unevenly split, which the next bound accounts for.</p>
+
+<div class="prop"><b>Proposition 2 (second-order counting bound).</b> Fix an opener $g$ and let $\mathcal B=\pi_g(V)\setminus\{W_g\}$. For any policy opening with $g$, each block $B\in\mathcal B$ contributes at most one answer found on guess 2 and at most
+$$u_3(B)=\min\Big(|B|,\ \max_{h\in V}\big([h\in B]+|\pi_h(B)\setminus\{W_h\}|\big)\Big)$$
+answers found within three guesses, so
+$$\mathbb{E}[T]\ \ge\ \mathrm{LB}(g)=\frac1n\Big(1+\sum_{B\in\mathcal B}\big(2+3(u_3(B)-1)+4(|B|-u_3(B))\big)\Big).$$
+<div class="proof">Within $B$ the second guess $h$ is one station and finds at most $[h\in B]$ answers; each non-win block of $\pi_h(B)$ is resolved on guess 3 for at most one of its members. Maximising over $h$ separately for the two counts relaxes the requirement that one $h$ serves both, so the cap holds for every policy, and filling the remaining answers at the smallest feasible depths minimises the total.</div></div>
+
+<p>For <span data-v="best.name"></span>, $\mathrm{LB}=<span data-v="best.lb"></span>$ against the policy's <span data-v="best.mean"></span>. Over all openers, $\min_g\mathrm{LB}(g)=<span data-v="glb"></span>$ at <span data-v="glb.name"></span>: under the uniform prior and on the map alone, no policy whatever can average fewer guesses. The greedy policy is therefore within <span data-v="best.gap"></span> guesses of optimal from its own opener, and within <span data-v="glb.gap"></span> of the best any policy could do.</p>
+
+<div class="prop"><b>Proposition 3 (bound with clues).</b> With the mode known in advance and the zone clue revealed after the first wrong guess, the same argument applied within each mode class $M$, with blocks of the joint partition of $M$ by (feedback, zone), gives $\mathbb{E}[T]\ge <span data-v="cb"></span>$. The re-implemented clue-aware policy attains <span data-v="ad.mean"></span>.</div>
+
+<h3>The exact optimum, and why greedy is enough</h3>
+
+<p>The optimal expected number of guesses satisfies the Bellman recursion
+$$V^*(C)=1+\min_{g\in V}\sum_{B\in\pi_g(C),\,B\ne W_g}\frac{|B|}{|C|}\,V^*(B),\qquad V^*(\{a\})=1.$$
+Its state space is the set of reachable candidate sets, its branching is $n$ per state, and constructing optimal identification trees is NP-hard in general (Hyafil and Rivest, 1976). Exact solutions are feasible for games of Wordle's size with careful pruning (Bertsimas and Paskov), and greedy policies of this kind carry a general $O(\log n)$ approximation guarantee for expected cost (Dasgupta, 2005; Golovin and Krause, 2011). Here the counting bounds make a direct argument unnecessary: the gap between the greedy policy and $\min_g \mathrm{LB}(g)$ is <span data-v="glb.gap"></span> guesses on the map alone, and between the clue-aware policy and Proposition 3 it is <span data-v="cb.gap"></span>. Any further optimisation is bounded by these gaps.</p>
+
+<section class="exhibit wide" id="fig-tree">
+  <div class="plate"><span class="no">Exhibit 8</span><span class="label">The whole policy</span>
+    <span class="controls" style="margin:0"><label for="treeop">from <select id="treeop"></select></label><span id="tree-note" style="color:var(--muted)"></span></span></div>
+  <div class="fig"><div class="scroll"><svg id="icicle" class="icicle" role="img" aria-label="Policy tree"></svg></div></div>
+  <p class="plaque">The complete greedy decision tree as an icicle diagram, map only. Columns are guesses; each box is a node, its height proportional to the answers that reach it, labelled with the station guessed there. A red tick marks the one answer each node's guess finds outright.</p>
+</section>
+
+<h2><span class="n">5</span>The service-information panel</h2>
+
+<p>The live game shows a panel headed <em>service information</em>: the answer's mode from the start, then one more clue after each wrong guess. Each clue is a function of the answer alone, a partition of $V$ fixed in advance. Appendix B defines them; two choose among several values by the game's stable string hash $h_0=7$, $h_{i+1}=(31h_i+c_i)\bmod 2^{32}$ over UTF-16 code units, taking element $h\bmod k$ of a sorted list. Since each $\kappa_j$ is deterministic, its mutual information with the answer under the uniform prior is its entropy, $I(\kappa_j;A)=H(\kappa_j)$.</p>
+
+<section class="exhibit wide" id="ex-clues">
+  <div class="plate"><span class="no">Exhibit 9</span><span class="label">What each clue is worth</span></div>
+  <div class="fig"><div class="scroll"><table id="cluetable"></table></div></div>
+  <p class="plaque">Information in each clue alone, computed on the solver's graph. The six together carry <span data-v="clue.joint"></span> of the <span data-v="log2n"></span> bits needed and single out <span data-v="clue.unique"></span> stations by themselves. The stops-from-the-end clue is the most informative single clue, because it is a distance in its own right.</p>
+</section>
+
+<p>The clue for the next wrong guess arrives whichever station is guessed, so the right objective for that guess is the joint partition $\pi_g(C)\wedge\kappa_{w+1}$. Both implementations apply clues to the version space but score guesses on $\pi_g(C)$ alone. Scoring on the joint partition is a refinement whose possible gain is bounded by the gap to Proposition 3.</p>
+
+<h2><span class="n">6</span>Results</h2>
+
+<section class="exhibit wide" id="ex-heat">
+  <div class="plate"><span class="no">Exhibit 10</span><span class="label">Where to start</span>
+    <span class="toggle" role="group" aria-label="Variant"><button type="button" id="heat-map" aria-pressed="true">map only</button><button type="button" id="heat-clue" aria-pressed="false">with panel</button></span></div>
+  <div class="fig">
+    <div class="split">
+      <div><div class="legend" id="heatlegend"></div><div class="mapbox" id="map2"></div></div>
+      <div id="opdetail"></div>
+    </div>
+  </div>
+  <p class="plaque">Every station coloured by the mean number of guesses the policy needs when it opens there, over all 420 answers (<span data-v="nn"></span> games per variant). With the panel, the policy opens at the chosen station whatever mode is shown. Click a station to inspect it: its first-guess partition, outcome distribution and lower bound.</p>
+</section>
+
+<section class="exhibit wide" id="ex-table">
+  <div class="plate"><span class="no">Exhibit 11</span><span class="label">Every opener</span>
+    <span class="controls" style="margin:0"><label for="opfilter">filter <input type="search" id="opfilter" placeholder="station name"></label><label for="opmode">mode <select id="opmode"><option value="">any</option><option value="tube">Underground</option><option value="overground">Overground</option><option value="dlr">DLR</option><option value="elizabeth">Elizabeth line</option></select></label></span></div>
+  <div class="tablebox"><table id="optable"></table></div>
+  <p class="plaque">All 420 openers. Click a column to sort and a row to select the station everywhere on the page. Mean and worst are over all answers; ≤2 and ≤3 are the shares solved within two and three guesses; E|C′| and $H_1$ describe the first guess alone; LB is Proposition 2.</p>
+</section>
+
+<p><b>Why <span data-v="best.name"></span>.</b> A good opener needs fine-grained feedback across all of $V$. <span data-v="best.name"></span> is east of the centre on five lines across four modes. Its shell profile (Exhibit 3) is wide and flat, so the distance alone splits the network into many readings, and its lines intersect most of those shells, multiplying the classes. It induces <span data-v="best.classes1"></span> blocks and leaves $\mathbb{E}|C'|=<span data-v="best.left"></span>$. <b>Why <span data-v="worst.name"></span>.</b> From the end of the Metropolitan line's Chesham branch nearly everything is far and reached through the same few stops, so distances bunch and the single line splits little: $\mathbb{E}|C'|=<span data-v="worst.left"></span>$. Even so every answer is found within five guesses; the worst opener costs <span data-v="spread"></span> of a guess on average.</p>
+
+<section class="exhibit wide" id="ex-mode">
+  <div class="plate"><span class="no">Exhibit 12</span><span class="label">The best opener for each mode shown</span>
+    <span class="toggle" role="group" aria-label="Mode" id="modebtns"></span></div>
+  <div class="fig"><div class="split"><div class="mapbox" id="mapMode"></div><div id="modedetail"></div></div></div>
+  <p class="plaque">Once the panel shows a mode, only that mode's stations remain (highlighted), and the best opener changes. Each station is coloured by the mean guesses when it opens against that mode's answers alone.</p>
+</section>
+
+<div class="scroll"><table id="modeopen"></table></div>
+
+<section class="exhibit wide" id="ex-diff">
+  <div class="plate"><span class="no">Exhibit 13</span><span class="label">Which answers are hard</span>
+    <span class="toggle" role="group" aria-label="Variant"><button type="button" id="diff-map" aria-pressed="true">map only</button><button type="button" id="diff-clue" aria-pressed="false">with panel</button></span></div>
+  <div class="fig"><div class="mapbox" id="mapDiff"></div><div class="legend" id="difflegend" style="margin-top:.5rem"></div></div>
+  <p class="plaque">Each station coloured by the number of guesses the policy needs when it is the answer: map only from <span data-v="best.name"></span>, or with the panel and the opener chosen after the mode. Answers on lines the opener shares are found fastest; dense areas off its lines are slowest.</p>
+</section>
+
+<section class="exhibit" id="fig-lines">
+  <div class="plate"><span class="no">Exhibit 14</span><span class="label">Difficulty by line</span></div>
+  <div class="fig"><svg id="linechart" role="img" aria-label="Mean guesses by line"></svg></div>
+  <p class="plaque">Mean guesses for answers on each line, map only, opening at <span data-v="best.name"></span>.</p>
+</section>
+
+<div class="scroll"><table id="modetable"></table></div>
+
+<div class="scroll"><table id="cluegain"></table></div>
+
+<h2><span class="n">7</span>Humans and the machine</h2>
+
+<p>The game's dashboard records every finished game. At the time of writing players had finished 8,933 daily games, winning 80.7% with 3.88 guesses on average when they won, and 4,097 practice games, winning 73.1% with 4.16. Players see the same panel the clue-aware solver reads. Practice is the like-for-like comparison, since its answers, like the solver's, are drawn uniformly; daily answers are curated.</p>
+
+<section class="exhibit wide" id="ex-human">
+  <div class="plate"><span class="no">Exhibit 15</span><span class="label">Where people start</span>
+    <span class="toggle" role="group" aria-label="Puzzle type"><button type="button" id="hum-daily" aria-pressed="true">daily</button><button type="button" id="hum-prac" aria-pressed="false">practice</button></span></div>
+  <div class="fig"><div class="mapbox" id="mapHuman"></div></div>
+  <p class="plaque">Circles sized by how often players open with each station, over the solver's opener-quality heatmap (map only). People cluster on a handful of Zone 1 hubs, King's Cross St. Pancras above all, and these are good openers: King's Cross is the solver's <span data-v="kx.rank"></span> best on the map alone and its best once the panel shows <em>Underground</em>, as it does for <span data-v="und"></span> stations. In practice, more players open on the Overground (Highbury &amp; Islington, Gospel Oak, Clapham Junction), close to the optimum for the Overground mode.</p>
+</section>
+
+<section class="exhibit wide" id="fig-hvm">
+  <div class="plate"><span class="no">Exhibit 16</span><span class="label">How many guesses</span></div>
+  <div class="fig">
+    <div class="legend" id="hvmlegend"></div>
+    <svg id="hvm" role="img" aria-label="Distribution of guesses, humans and solver"></svg>
+    <details><summary>table</summary><div class="scroll"><table id="hvmtable"></table></div></details>
+  </div>
+  <p class="plaque">Share of games finished in one to six guesses, or lost. The solver never loses; with the panel it finishes nearly three quarters of games on the second guess.</p>
+</section>
+
+<section class="exhibit wide" id="ex-first">
+  <div class="plate"><span class="no">Exhibit 17</span><span class="label">The first reading</span></div>
+  <div class="fig"><div class="legend" id="firstlegend"></div><svg id="firstdist" role="img" aria-label="Distance shown after the first guess"></svg></div>
+  <p class="plaque">Distribution of the stop count shown after the first guess: for players' daily games (all openers), and for the King's Cross opener against a uniformly drawn answer. Players' first readings are closer, mean 6.07 stops from King's Cross against <span data-v="kx.meand"></span> for a uniform answer, which is the curated daily schedule showing through: daily answers are nearer the centre than a uniform draw. This is the main threat to reading daily statistics as a measure of skill.</p>
+</section>
+
+<div class="prop"><b>Proposition 4 (constant-information model).</b> Suppose a player's candidate set after $t-1$ wrong guesses has size $n\,2^{-b(t-1)}$ with the answer uniform within it, so the hazard of solving at guess $t$ is $h_t=\min\big(1, 2^{b(t-1)}/n\big)$, and losses are censored at six. The maximum-likelihood estimates of $b$, in bits per guess, are:</div>
+
+<div class="scroll"><table id="bitstable"></table></div>
+
+<p>Players extract roughly <span data-v="hp.b"></span> bits per guess in practice and <span data-v="hd.b"></span> in daily play, against <span data-v="sm.b"></span> for the solver on the map alone. The table compares the fitted and observed distributions. The model is a poor description of the solver, whose candidate sets collapse faster than geometrically once the second guess lands; for the solver the more meaningful figure is $\log_2 n/\mathbb{E}[T]$, also tabulated. With caveats: the dashboard counts finished games only, so abandoned games are missing; players are a self-selected sample; daily answers are curated; and the model assumes a uniform answer within a geometrically shrinking set, which ignores that people do not maintain exact version spaces. Within those caveats, the solver obtains nearly twice as much information from each guess as a typical player.</p>
+
+<p>The reason is not the choice of opener, which people get right, but what happens after it. The shared-line component is a set intersection over up to five lines, and combining it with a distance and a zone reading across a 420-station map, then choosing a second guess that trilaterates (Lemma 2), is the work the version space does without effort.</p>
+
+<h2><span class="n">8</span>Discussion</h2>
+
+<p>Three properties of the network explain why a one-step rule is near-optimal. Feedback is rich: a single guess from a good opener induces about 150 blocks, so most of the work happens in the first two guesses, where greedy and optimal policies differ least. Blocks after the first guess are small, mostly under ten, and for small blocks the counting bound is nearly tight. And the metric structure (Lemma 2) means good second guesses are plentiful: almost any station far from the first guess trilaterates.</p>
+
+<p>The panel matters more than any choice of opener. Knowing the mode removes 1.5 bits before the first guess, and each later clue refines a block the feedback has already made small. Together they move the expected game from 2.71 guesses to about 2.25 and the worst case from five to four or fewer.</p>
+
+<h2><span class="n">9</span>Limitations and threats to validity</h2>
+
+<p><b>Map drift.</b> The solver's graph is rebuilt from TfL Open Data and may disagree with the game's after route changes. The matching diameter and zero-penalty live games suggest agreement today, and the soft-consistency rule (§3) bounds the damage of a disagreement, but the results in §6 are for the solver's graph. <b>Prior.</b> All results assume uniform answers; daily answers are curated and Exhibit 17 shows they differ. <b>Greedy versus optimal.</b> The gaps to the lower bounds are upper bounds on the possible improvement, not measurements of it; the true optimum may lie between. <b>Two implementations.</b> The reference Rust solver and the JavaScript re-implementation used for the figures agree exactly for the best opener on the map alone and to within 0.01 guesses for the others, where ties in $H_1$ are broken by floating-point summation order; with clues they differ slightly (2.264 against <span data-v="ad.mean"></span>), from differences in how clues enter the candidate set and tie-breaking, and both figures are reported. <b>Human data.</b> Dashboard counts are aggregates of finished games from self-selected players; there is no per-game data, so per-guess human behaviour is modelled, not observed.</p>
+
+<h2><span class="n">10</span>Implementation</h2>
+
+<p>The solver is one Rust binary (<code>src/main.rs</code>, <code>network.rs</code>, <code>solver.rs</code>, <code>tui.rs</code>, <code>site.rs</code>). A ratatui terminal interface draws the network in Braille in line colours, zooming to the surviving candidates. In automatic mode it drives the live game in a headless Chromium (<code>site.rs</code>): it types each guess, chooses the matching suggestion, reads the rendered feedback row and the service-information panel, and nothing else; requests to the game's analytics endpoint are blocked so automated games stay out of the statistics above. Releases build macOS and static Linux binaries in CI and publish them to a Homebrew tap and as release assets for mise.</p>
+
+<h2><span class="n">A</span>Appendix: algorithms</h2>
+<div class="algo">CONSISTENT(V, observations, clues)
+  for v in V: ρ(v) ← Σ_i penalty(f(g_i, v), φ_i) + Σ_j 3·[κ_j(v) ≠ c_j]
+  return { v : ρ(v) = min ρ }
+
+RANK(C, guessed)
+  if |C| ≤ 2: return C
+  for g in V \ guessed:
+    count ← hashmap from feedback to block size, over a in C of f(g, a)
+    E ← Σ_{B not win} |B|² / |C|      H1 ← −Σ p log₂ p      worst ← max non-win |B|
+  sort by (E ↑, g ∈ C first, H1 ↓, index ↑)
+
+PLAY(answer, opener)
+  C ← V ∩ κ₀⁻¹(mode shown);  g ← opener
+  loop: φ ← game(g); if φ wins: stop
+        reveal next clue; C ← CONSISTENT(...); g ← RANK(C, guesses)[0]</div>
+
+<h2><span class="n">B</span>Appendix: clue definitions</h2>
+<p><b>Mode.</b> The station's modes sorted (dlr, elizabeth, overground, tube); element $h(\text{name})\bmod k$. <b>Fare zone.</b> $Z(a)$, or <em>outside the zones</em>. <b>On the network.</b> <em>End of the line</em> if $a$ has degree 1 in $G$; else <em>an interchange</em> if $|L(a)|>1$; else <em>a through station</em>. <b>One of its lines.</b> The station's line identifiers sorted; element $h(\text{name})\bmod k$. <b>From the end of the line.</b> On the subgraph of edges carrying that line, a multi-source breadth-first search from the line's ends, the vertices with at most one distinct neighbour on it; if the line has no ends, the minimum over the station's lines. <b>First letter.</b> The first character of the name.</p>
+
+<h2><span class="n">C</span>Appendix: data pipeline and reproducibility</h2>
+<p>The network is rebuilt with <code>tubele-solver fetch</code>. The map-only results in §6 come from <code>tubele-solver bench</code> and <code>tubele-solver openers</code>; the live behaviour from <code>cargo test -- --ignored</code>, which plays the daily game and a practice round through the browser. The figures here are computed by <code>build/build.js</code> beside this page from <code>data/network.json</code>, using a port of the solver (<code>build/solver.js</code>) whose map-only results match the Rust binary up to floating-point tie-breaking. Human statistics are aggregate counts read from the game's dashboard.</p>
+
+<h2><span class="n">R</span>References</h2>
+<ol class="refs">
+  <li>Hyafil, L. and Rivest, R. L. (1976). Constructing optimal binary decision trees is NP-complete. <em>Information Processing Letters</em> 5(1), 15–17.</li>
+  <li>Knuth, D. E. (1976). The computer as Master Mind. <em>Journal of Recreational Mathematics</em> 9(1), 1–6.</li>
+  <li>Mitchell, T. M. (1982). Generalization as search. <em>Artificial Intelligence</em> 18(2), 203–226.</li>
+  <li>Rényi, A. (1961). On measures of entropy and information. <em>Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and Probability</em> 1, 547–561.</li>
+  <li>Dasgupta, S. (2005). Analysis of a greedy active learning strategy. <em>Advances in Neural Information Processing Systems</em> 17.</li>
+  <li>Golovin, D. and Krause, A. (2011). Adaptive submodularity: theory and applications in active learning and stochastic optimization. <em>Journal of Artificial Intelligence Research</em> 42, 427–486.</li>
+  <li>Bertsimas, D. and Paskov, A. An exact and interpretable solution to Wordle. MIT Operations Research Center.</li>
+</ol>
+
+</main>
+
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+window.MathJax = { tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] }, svg: { fontCache: 'global' }, startup: { typeset: false } };
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-svg.js"></script>
+<script src="solver.js"></script>
+<script src="data.js"></script>
+<script src="paper.js"></script>

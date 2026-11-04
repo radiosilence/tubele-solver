@@ -232,6 +232,8 @@
 
   // ── Exhibit 0: hero ──
   const hero = makeMap(document.getElementById('mapHero'), { trains: 2, zones: true, label: 'The whole network with trains running', onClick: select });
+  // On narrow screens the hero keeps its height and crops to the centre rather than shrinking.
+  d3.select('#mapHero svg').attr('preserveAspectRatio', 'xMidYMid slice');
 
   // ── Exhibit 1: rolling stock ──
   (function () {

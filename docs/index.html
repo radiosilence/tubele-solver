@@ -183,6 +183,10 @@ input[type="range"] { accent-color: var(--signal); }
 tr.sel td { background: color-mix(in oklab, var(--signal) 12%, transparent); }
 .kbd { font: .72rem var(--mono); border: 1px solid var(--faint); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3rem; }
 .text .wide { width: min(var(--wide), calc(100vw - 2 * max(16px, env(safe-area-inset-left, 0px)))); max-width: none; margin-left: 50%; transform: translateX(-50%); }
+@media (max-width: 640px) {
+  .hero svg { height: 62vh; min-height: 340px; width: 100%; }
+  .hero-cap { position: static; display: block; margin: .5rem max(16px, env(safe-area-inset-left, 0px)); }
+}
 </style>
 
 
