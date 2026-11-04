@@ -866,8 +866,8 @@ fn fit_bounds(net: &Network, focus: &[usize], area: Rect) -> ([f64; 2], [f64; 2]
     let (cx, cy) = ((x0 + x1) / 2.0, (y0 + y1) / 2.0);
     // Degrees of longitude are ~0.62 the length of degrees of latitude here.
     let kx = 0.62;
-    let mut w = ((x1 - x0) * kx).max(0.02) * 1.25;
-    let mut h = (y1 - y0).max(0.02) * 1.25;
+    let mut w = ((x1 - x0) * kx).max(0.1) * 1.25;
+    let mut h = (y1 - y0).max(0.1) * 1.25;
     let target = area.width.max(1) as f64 / (area.height.max(1) as f64 * 2.0);
     if w / h < target {
         w = h * target
