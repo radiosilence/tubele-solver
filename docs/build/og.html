@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<title>Social card</title>
+<!-- Renders docs/og.png: open at 1200x630 in a headless browser and screenshot. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  html, body { margin: 0; width: 1200px; height: 630px; overflow: hidden; background: #111214; }
+  canvas { position: absolute; inset: 0; }
+  .scrim { position: absolute; inset: 0; background: linear-gradient(90deg, #111214 0%, rgba(17,18,20,.92) 34%, rgba(17,18,20,.35) 62%, rgba(17,18,20,0) 100%); }
+  .text { position: absolute; left: 64px; top: 64px; bottom: 56px; width: 560px; display: flex; flex-direction: column; color: #f2efe8; }
+  .kicker { font: 500 17px/1 'IBM Plex Mono', monospace; letter-spacing: .14em; text-transform: uppercase; color: #9b978d; }
+  h1 { font: 900 84px/0.94 'Archivo', sans-serif; font-stretch: 88%; letter-spacing: -.02em; margin: 26px 0 0; }
+  .sub { font: 400 26px/1.3 'Archivo', sans-serif; color: #c9c5bb; margin-top: 22px; }
+  .stats { margin-top: auto; display: flex; gap: 12px; flex-wrap: wrap; }
+  .stat { font: 500 19px/1 'IBM Plex Mono', monospace; color: #111214; background: #f2efe8; padding: 11px 14px; border-radius: 6px; }
+  .stat.alt { background: transparent; color: #f2efe8; box-shadow: inset 0 0 0 1.5px #5d5a53; }
+  .by { font: 500 16px/1 'IBM Plex Mono', monospace; color: #8b877e; margin-top: 18px; }
+</style>
+</head>
+<body>
+<canvas id="map" width="2400" height="1260" style="width:1200px;height:630px"></canvas>
+<div class="scrim"></div>
+<div class="text">
+  <div class="kicker">Technical report &amp; gallery</div>
+  <h1>Solving<br>Tubele</h1>
+  <div class="sub">Version-space search on the London rail graph</div>
+  <div class="stats">
+    <div class="stat">2.26 guesses on average</div>
+    <div class="stat">never more than 4</div>
+    <div class="stat alt">players: 3.88 on wins</div>
+  </div>
+  <div class="by">radiosilence.github.io/tubele-solver</div>
+</div>
+<script src="../data.js"></script>
+<script>
+  const COLOURS = ['#B36305','#E32017','#FFD300','#00782A','#F3A9BB','#A0A5A9','#9B0056','#9a9a9a','#1c5fd1','#0098D4','#95CDBA','#00A4A7','#8a6fd1','#8d9093','#FAA61A','#2a95d4','#5BBD72','#a5547f','#EF3340'];
+  const { stations, edges } = window.PAPER_DATA;
+  const k = Math.cos(51.5 * Math.PI / 180);
+  const xs = stations.map(s => s[2] * k), ys = stations.map(s => -s[1]);
+  // Frame central London on the right; outer branches run off the edges.
+  const cx = -0.10 * k, cy = -51.515, span = 0.62;
+  const W = 2400, H = 1260, scale = W / span, ox = W * 0.60, oy = H * 0.52;
+  const px = i => ox + (xs[i] - cx) * scale, py = i => oy + (ys[i] - cy) * scale;
+  const ctx = document.getElementById('map').getContext('2d');
+  ctx.lineCap = 'round';
+  ctx.lineWidth = 5;
+  for (const [a, b, mask] of edges) {
+    const line = Math.clz32(mask & -mask) ^ 31;
+    ctx.strokeStyle = COLOURS[line];
+    ctx.beginPath(); ctx.moveTo(px(a), py(a)); ctx.lineTo(px(b), py(b)); ctx.stroke();
+  }
+  for (let i = 0; i < stations.length; i++) {
+    const interchange = (stations[i][4] & (stations[i][4] - 1)) !== 0;
+    ctx.beginPath(); ctx.arc(px(i), py(i), interchange ? 7 : 4.5, 0, Math.PI * 2);
+    ctx.fillStyle = '#111214'; ctx.fill();
+    ctx.lineWidth = interchange ? 3 : 2.2; ctx.strokeStyle = '#f2efe8'; ctx.stroke();
+  }
+</script>
+</body>
+</html>
