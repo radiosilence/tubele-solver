@@ -1,0 +1,36 @@
+/* Gallery layer: full-bleed hero, exhibit plaques, rolling stock. */
+.hero { margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px))) calc(-1 * max(16px, env(safe-area-inset-right, 0px))); background: var(--panel); border-block: 1px solid var(--rule); position: relative; }
+.hero .mapbox { border: 0; border-radius: 0; background: transparent; }
+.hero-cap { position: absolute; left: max(16px, env(safe-area-inset-left, 0px)); bottom: .8rem; font: .72rem/1.3 var(--mono); color: var(--muted); background: color-mix(in oklab, var(--panel) 80%, transparent); padding: .25rem .5rem; border-radius: 3px; }
+.exhibit { margin: 2.4rem auto; }
+.exhibit > .plate { display: flex; flex-wrap: wrap; gap: .3rem 1rem; align-items: baseline; margin-bottom: .55rem; }
+.exhibit .no { font: 600 .72rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--signal); }
+.exhibit .label { font: 800 1.08rem/1.2 var(--display); font-stretch: 90%; }
+.exhibit .plaque { font-size: .92rem; line-height: 1.55; color: var(--ink-2); margin-top: .7rem; max-width: 46rem; }
+.toggle { display: inline-flex; border: 1px solid var(--faint); border-radius: 4px; overflow: hidden; }
+.toggle button { border: 0; border-radius: 0; background: var(--bg); }
+.toggle button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+.stock { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .8rem; }
+.stock > div { border: 1px solid var(--rule); border-radius: 4px; padding: .7rem .8rem; background: var(--bg); }
+.stock svg { width: 100%; height: 3.2rem; display: block; margin-bottom: .4rem; }
+.stock b { font-family: var(--display); font-weight: 800; }
+.stock span { display: block; font: .74rem/1.4 var(--mono); color: var(--muted); }
+.contrib { padding-left: 1.2rem; }
+.contrib li { margin-bottom: .45rem; }
+.notation td:first-child { white-space: nowrap; }
+.multiples { display: grid; grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr)); gap: .6rem; }
+.multiples figure { margin: 0; border: 1px solid var(--rule); border-radius: 4px; padding: .3rem; background: var(--bg); }
+.multiples figcaption { margin: .2rem .2rem 0; font: .72rem/1.35 var(--mono); color: var(--ink-2); }
+.multiples canvas { width: 100%; height: auto; display: block; }
+.multiples figure.on { border-color: var(--signal); }
+input[type="range"] { accent-color: var(--signal); }
+.algo { background: var(--panel); border: 1px solid var(--rule); border-radius: 4px; padding: .8rem 1rem; font: .8rem/1.55 var(--mono); white-space: pre; overflow-x: auto; }
+.livemath { min-height: 3.5rem; }
+.th-sort { cursor: pointer; user-select: none; }
+.th-sort[aria-sort="ascending"]::after { content: " ▲"; }
+.th-sort[aria-sort="descending"]::after { content: " ▼"; }
+.tablebox { max-height: 28rem; overflow: auto; border: 1px solid var(--rule); border-radius: 4px; }
+.tablebox thead th { position: sticky; top: 0; background: var(--panel); z-index: 1; }
+tr.sel td { background: color-mix(in oklab, var(--signal) 12%, transparent); }
+.kbd { font: .72rem var(--mono); border: 1px solid var(--faint); border-bottom-width: 2px; border-radius: 3px; padding: 0 .3rem; }
+.text .wide { width: min(var(--wide), calc(100vw - 2 * max(16px, env(safe-area-inset-left, 0px)))); max-width: none; margin-left: 50%; transform: translateX(-50%); }

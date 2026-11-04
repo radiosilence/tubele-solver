@@ -7,6 +7,10 @@ and nothing else: not the answer schedule, not which stations the game favours a
 guess returns what the game shows a player, and the solver keeps only the stations consistent with
 every clue so far.
 
+A long-form, interactive account of the method and results, including a comparison with players'
+results, is at [radiosilence.github.io/tubele-solver](https://radiosilence.github.io/tubele-solver/).
+Its figures are computed by `docs/build` from `data/network.json`.
+
 ## Install
 
 ```bash
