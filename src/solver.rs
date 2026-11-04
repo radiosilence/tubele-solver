@@ -1,4 +1,4 @@
-use crate::network::Network;
+use crate::network::{LINES, Network, Role, line_mode};
 use std::collections::HashMap;
 
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
@@ -96,7 +96,12 @@ pub struct Suggestion {
 
 /// `skip` holds stations the game refused as guesses: they cannot be answers
 /// either, and are never suggested.
-pub fn analyse(net: &Network, observations: &[Observation], skip: &[usize]) -> Analysis {
+pub fn analyse(
+    net: &Network,
+    observations: &[Observation],
+    skip: &[usize],
+    clues: &Clues,
+) -> Analysis {
     let mut guessed: Vec<usize> = observations.iter().map(|o| o.guess).collect();
     guessed.extend_from_slice(skip);
     let scored: Vec<(usize, u32)> = (0..net.len())
@@ -106,7 +111,10 @@ pub fn analyse(net: &Network, observations: &[Observation], skip: &[usize]) -> A
                     .iter()
                     .any(|o| o.guess == *s && o.feedback.is_win())
         })
-        .map(|s| (s, observations.iter().map(|o| penalty(net, o, s)).sum()))
+        .map(|s| {
+            let p: u32 = observations.iter().map(|o| penalty(net, o, s)).sum();
+            (s, p + 3 * clues.violations(net, s))
+        })
         .collect();
     let mismatch = scored.iter().map(|&(_, p)| p).min().unwrap_or(0);
     let candidates: Vec<usize> = scored
@@ -180,18 +188,132 @@ pub fn rank(net: &Network, candidates: &[usize], guessed: &[usize]) -> Vec<Sugge
     out
 }
 
-/// Play one game against a known answer using only the feedback.
-pub fn play(net: &Network, answer: usize, opener: Option<usize>) -> Vec<Observation> {
+/// Play one game against a known answer using only what the game shows: the
+/// feedback rows and, when `with_clues`, the service-information panel.
+pub fn play(
+    net: &Network,
+    answer: usize,
+    opener: Option<usize>,
+    with_clues: bool,
+) -> Vec<Observation> {
     let mut obs = Vec::new();
     loop {
+        let clues = if with_clues {
+            Clues::reveal(net, answer, obs.len())
+        } else {
+            Clues::default()
+        };
         let guess = match (obs.is_empty(), opener) {
             (true, Some(o)) => o,
-            _ => analyse(net, &obs, &[]).ranked[0].station,
+            _ => analyse(net, &obs, &[], &clues).ranked[0].station,
         };
         let feedback = Feedback::compute(net, guess, answer);
         obs.push(Observation { guess, feedback });
         if feedback.is_win() || obs.len() >= 20 {
             return obs;
+        }
+    }
+}
+
+/// The game's "service information" panel: the answer's transport mode from
+/// the start, then one more fact after each wrong guess.
+#[derive(Clone, Default, Debug, PartialEq)]
+pub struct Clues {
+    /// Index into `network::MODE_NAMES`.
+    pub mode: Option<usize>,
+    /// Exact fare zones; empty means outside them.
+    pub zones: Option<Vec<u8>>,
+    pub role: Option<Role>,
+    /// One of the answer's lines.
+    pub line: Option<usize>,
+    /// Stops from the end of `line`.
+    pub end_stops: Option<u8>,
+    pub letter: Option<char>,
+}
+
+/// The game's stable pick: a 31-multiplier string hash of the name over its
+/// UTF-16 units, modulo the number of choices.
+fn pick_stable<T: Copy>(items: &[T], name: &str) -> T {
+    let mut h: u32 = 7;
+    for c in name.encode_utf16() {
+        h = h.wrapping_mul(31).wrapping_add(c as u32);
+    }
+    items[h as usize % items.len()]
+}
+
+pub fn end_stops(net: &Network, station: usize, line: usize) -> u8 {
+    let by_line = net.end_stops[station][line];
+    if by_line != u8::MAX {
+        return by_line;
+    }
+    net.end_stops[station]
+        .iter()
+        .copied()
+        .min()
+        .unwrap_or(u8::MAX)
+}
+
+impl Clues {
+    /// How many clues `station` contradicts.
+    pub fn violations(&self, net: &Network, station: usize) -> u32 {
+        let s = &net.stations[station];
+        let lines = (0..LINES.len()).filter(|l| s.lines & (1 << l) != 0);
+        let mut v = 0;
+        if let Some(m) = self.mode
+            && !lines.clone().any(|l| line_mode(l) == m)
+        {
+            v += 1;
+        }
+        if let Some(z) = &self.zones
+            && *z != s.zones
+        {
+            v += 1;
+        }
+        if let Some(r) = self.role
+            && r != net.roles[station]
+        {
+            v += 1;
+        }
+        if let Some(l) = self.line {
+            if s.lines & (1 << l) == 0 {
+                v += 1;
+            } else if let Some(e) = self.end_stops
+                && e != end_stops(net, station, l)
+            {
+                v += 1;
+            }
+        }
+        if let Some(c) = self.letter
+            && !s
+                .name
+                .chars()
+                .next()
+                .is_some_and(|f| f.eq_ignore_ascii_case(&c))
+        {
+            v += 1;
+        }
+        v
+    }
+
+    /// What the game shows about `answer` after `wrong` incorrect guesses.
+    pub fn reveal(net: &Network, answer: usize, wrong: usize) -> Self {
+        let s = &net.stations[answer];
+        let mut ids: Vec<(&str, usize)> = (0..LINES.len())
+            .filter(|l| s.lines & (1 << l) != 0)
+            .map(|l| (LINES[l].0, l))
+            .collect();
+        ids.sort();
+        let mut modes: Vec<usize> = ids.iter().map(|&(_, l)| line_mode(l)).collect();
+        modes.sort();
+        modes.dedup();
+        let line = pick_stable(&ids, &s.name).1;
+        Self {
+            mode: Some(pick_stable(&modes, &s.name)),
+            zones: (wrong >= 1).then(|| s.zones.clone()),
+            role: (wrong >= 2).then(|| net.roles[answer]),
+            line: (wrong >= 3).then_some(line),
+            end_stops: (wrong >= 4).then(|| end_stops(net, answer, line)),
+            letter: (wrong >= 5).then(|| s.name.chars().next().unwrap_or(' ')),
         }
     }
 }

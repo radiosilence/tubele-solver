@@ -1,6 +1,8 @@
-use crate::network::{LINES, Network, line_code, line_colour, line_name};
+use crate::network::{
+    LINES, MODE_NAMES, Network, line_code, line_colour, line_full_name, line_name,
+};
 use crate::site::{Event as SiteEvent, Site};
-use crate::solver::{self, Analysis, Feedback, Observation, ZoneMatch};
+use crate::solver::{self, Analysis, Clues, Feedback, Observation, ZoneMatch};
 use anyhow::Result;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers};
 use ratatui::{
@@ -82,6 +84,8 @@ struct App {
     /// Practice rounds still to play after the current game.
     practice_left: usize,
     results: Vec<RoundResult>,
+    /// What the service-information panel has revealed so far.
+    clues: Clues,
     obs: Vec<Observation>,
     /// Stations the live game did not recognise; never guessed again.
     skip: Vec<usize>,
@@ -116,9 +120,9 @@ fn random_below(n: usize) -> usize {
 
 impl App {
     fn new(net: Network, referee: Referee, opener: Option<Opener>) -> Self {
-        let analysis = solver::analyse(&net, &[], &[]);
+        let analysis = solver::analyse(&net, &[], &[], &Clues::default());
         let live = matches!(referee, Referee::Live(_));
-        Self {
+        let mut app = Self {
             net,
             referee,
             live: LiveState::Connecting,
@@ -127,6 +131,7 @@ impl App {
             opener,
             practice_left: 0,
             results: Vec::new(),
+            clues: Clues::default(),
             obs: Vec::new(),
             skip: Vec::new(),
             analysis,
@@ -138,7 +143,19 @@ impl App {
             // Live play and a demo with a chosen opener run by themselves.
             autoplay: live || opener.is_some(),
             last_step: Instant::now(),
+        };
+        app.reanalyse();
+        app
+    }
+
+    /// Recompute candidates and suggestions. In a demo the referee also
+    /// reveals clues the way the game does, one per wrong guess.
+    fn reanalyse(&mut self) {
+        if let Referee::Simulated(answer) = self.referee {
+            let wrong = self.obs.iter().filter(|o| !o.feedback.is_win()).count();
+            self.clues = Clues::reveal(&self.net, answer, wrong);
         }
+        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip, &self.clues);
     }
 
     fn event_loop(&mut self, terminal: &mut DefaultTerminal) -> Result<()> {
@@ -180,8 +197,10 @@ impl App {
             return;
         };
         match event {
-            SiteEvent::Ready { puzzle } => {
+            SiteEvent::Ready { puzzle, clues } => {
                 self.puzzle = puzzle;
+                self.clues = clues;
+                self.reanalyse();
                 self.live = LiveState::Ready;
                 self.last_step = Instant::now();
             }
@@ -193,13 +212,16 @@ impl App {
                 let Stage::Waiting(guess) = self.stage else {
                     return;
                 };
+                if let Ok(r) = &row {
+                    self.clues = r.clues.clone();
+                }
                 match row.and_then(|r| r.feedback(&self.net, guess)) {
                     Ok(feedback) => self.commit(Observation { guess, feedback }),
                     Err(e) => {
                         // The game did not take this station; rule it out and carry on.
                         self.notice = Some(format!("{e:#}"));
                         self.skip.push(guess);
-                        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
+                        self.reanalyse();
                         self.stage = Stage::Pick {
                             query: String::new(),
                             cursor: 0,
@@ -239,7 +261,7 @@ impl App {
 
     fn commit(&mut self, obs: Observation) {
         self.obs.push(obs);
-        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
+        self.reanalyse();
         self.last_step = Instant::now();
         let out_of_guesses = self.is_live() && self.obs.len() >= MAX_GUESSES;
         self.stage =
@@ -269,9 +291,10 @@ impl App {
         site.next_round();
         self.live = LiveState::Connecting;
         self.notice = None;
+        self.clues = Clues::default();
         self.obs.clear();
         self.skip.clear();
-        self.analysis = solver::analyse(&self.net, &[], &[]);
+        self.reanalyse();
         self.stage = Stage::Pick {
             query: String::new(),
             cursor: 0,
@@ -286,7 +309,7 @@ impl App {
             return;
         }
         self.obs.pop();
-        self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
+        self.reanalyse();
         self.stage = Stage::Pick {
             query: String::new(),
             cursor: 0,
@@ -488,7 +511,7 @@ impl App {
             Layout::horizontal([Constraint::Percentage(58), Constraint::Percentage(42)])
                 .areas(body);
         let [guesses, next, left] = Layout::vertical([
-            Constraint::Length(9),
+            Constraint::Length(10),
             Constraint::Length(9),
             Constraint::Min(4),
         ])
@@ -764,7 +787,46 @@ impl App {
         for i in self.obs.len()..MAX_GUESSES {
             lines.push(Line::styled(format!("{} ·", i + 1), Style::new().fg(FAINT)));
         }
+        lines.push(self.clue_line());
         f.render_widget(Paragraph::new(lines).block(Self::panel("guesses")), area);
+    }
+
+    /// The service-information panel in one line.
+    fn clue_line(&self) -> Line<'static> {
+        let c = &self.clues;
+        let mut parts: Vec<String> = Vec::new();
+        if let Some(m) = c.mode {
+            parts.push(MODE_NAMES[m].to_string());
+        }
+        if let Some(z) = &c.zones {
+            parts.push(if z.is_empty() {
+                "outside the zones".into()
+            } else {
+                format!(
+                    "zone {}",
+                    z.iter().map(u8::to_string).collect::<Vec<_>>().join("/")
+                )
+            });
+        }
+        if let Some(r) = c.role {
+            parts.push(format!("{r:?}").to_lowercase());
+        }
+        if let Some(l) = c.line {
+            parts.push(format!("{} line", line_full_name(l)));
+        }
+        if let Some(e) = c.end_stops {
+            parts.push(format!("{e} from the end"));
+        }
+        if let Some(ch) = c.letter {
+            parts.push(format!("starts with {ch}"));
+        }
+        if parts.is_empty() {
+            return Line::default();
+        }
+        Line::from(vec![
+            Span::styled("ⓘ ", Style::new().fg(ACCENT)),
+            Span::styled(parts.join(" · "), Style::new().fg(ACCENT)),
+        ])
     }
 
     fn draw_next(&self, f: &mut Frame, area: Rect) {
@@ -1243,7 +1305,7 @@ mod tests {
     fn hard_game_renders() {
         let net = Network::embedded();
         let hard = (0..net.len())
-            .find(|&a| solver::play(&net, a, None).len() >= 4)
+            .find(|&a| solver::play(&net, a, None, true).len() >= 4)
             .unwrap();
         let mut app = app(Some(hard));
         for _ in 0..3 {

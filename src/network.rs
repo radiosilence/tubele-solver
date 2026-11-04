@@ -69,11 +69,25 @@ pub struct NetworkData {
     pub edges: Vec<Edge>,
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Role {
+    /// One neighbour on the whole network.
+    Terminus,
+    /// Served by more than one line.
+    Interchange,
+    Through,
+}
+
 pub struct Network {
     pub stations: Vec<Station>,
     pub edges: Vec<Edge>,
     /// Row-major n×n matrix of fewest-stops distances.
     dist: Vec<u8>,
+    pub roles: Vec<Role>,
+    /// Per station and line: stops to the nearest end of that line, riding
+    /// only that line. `u8::MAX` where the line does not serve the station or
+    /// has no ends.
+    pub end_stops: Vec<[u8; 19]>,
 }
 
 impl Network {
@@ -105,10 +119,24 @@ impl Network {
                 }
             }
         }
+        let roles = (0..n)
+            .map(|s| {
+                if adj[s].len() == 1 {
+                    Role::Terminus
+                } else if data.stations[s].lines.count_ones() > 1 {
+                    Role::Interchange
+                } else {
+                    Role::Through
+                }
+            })
+            .collect();
+        let end_stops = end_stops(n, &data.edges);
         Self {
             stations: data.stations,
             edges: data.edges,
             dist,
+            roles,
+            end_stops,
         }
     }
 
@@ -155,6 +183,55 @@ impl Network {
                 .then_with(|| self.stations[a.1].name.cmp(&self.stations[b.1].name))
         });
         hits.into_iter().map(|(_, i)| i).collect()
+    }
+}
+
+/// For each line, stations with at most one distinct neighbour along that
+/// line are its ends; a multi-source BFS within the line gives every station
+/// its distance to the nearest end.
+fn end_stops(n: usize, edges: &[Edge]) -> Vec<[u8; 19]> {
+    let mut out = vec![[u8::MAX; 19]; n];
+    for (line, _) in LINES.iter().enumerate() {
+        let mut adj: Vec<Vec<usize>> = vec![Vec::new(); n];
+        for e in edges.iter().filter(|e| e.lines & (1 << line) != 0) {
+            adj[e.a as usize].push(e.b as usize);
+            adj[e.b as usize].push(e.a as usize);
+        }
+        let mut queue: VecDeque<usize> = (0..n).filter(|&s| adj[s].len() == 1).collect();
+        for &s in &queue {
+            out[s][line] = 0;
+        }
+        while let Some(u) = queue.pop_front() {
+            for &v in &adj[u] {
+                if out[v][line] == u8::MAX {
+                    out[v][line] = out[u][line] + 1;
+                    queue.push_back(v);
+                }
+            }
+        }
+    }
+    out
+}
+
+/// Transport mode of a line: 0 DLR, 1 Elizabeth, 2 Overground, 3 Underground,
+/// which is also the alphabetical order of their ids.
+pub fn line_mode(line: usize) -> usize {
+    match line {
+        11 => 0,
+        12 => 1,
+        13..=18 => 2,
+        _ => 3,
+    }
+}
+
+pub const MODE_NAMES: [&str; 4] = ["DLR", "Elizabeth line", "Overground", "Underground"];
+
+/// Full line name, as the game writes it in a clue.
+pub fn line_full_name(line: usize) -> &'static str {
+    match LINES[line].0 {
+        "hammersmith-city" => "Hammersmith & City",
+        "waterloo-city" => "Waterloo & City",
+        _ => LINES[line].1,
     }
 }
 

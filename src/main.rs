@@ -133,14 +133,20 @@ fn find(net: &Network, name: &str) -> Result<usize> {
 }
 
 fn bench(net: &Network) {
-    let opener = solver::analyse(net, &[], &[]).ranked[0].station;
-    println!("opening guess: {}", net.stations[opener].name);
+    let opener = solver::analyse(net, &[], &[], &Default::default()).ranked[0].station;
+    println!("map only, opening with {}", net.stations[opener].name);
+    bench_run(net, |a| solver::play(net, a, Some(opener), false).len());
+    println!("\nwith the service-information clues, opener chosen after the mode is shown");
+    bench_run(net, |a| solver::play(net, a, None, true).len());
+}
+
+fn bench_run(net: &Network, game_length: impl Fn(usize) -> usize) {
     let mut histogram = [0usize; 21];
     let mut worst = Vec::new();
     for answer in 0..net.len() {
-        let game = solver::play(net, answer, Some(opener));
-        histogram[game.len()] += 1;
-        if game.len() > 6 {
+        let len = game_length(answer);
+        histogram[len] += 1;
+        if len > 6 {
             worst.push(net.stations[answer].name.clone());
         }
     }
@@ -202,7 +208,7 @@ fn openers(net: &Network) {
                         .into_iter()
                         .map(|o| {
                             let lengths: Vec<usize> = (0..n)
-                                .map(|a| solver::play(net, a, Some(o)).len())
+                                .map(|a| solver::play(net, a, Some(o), false).len())
                                 .collect();
                             let share = |k: usize| {
                                 lengths.iter().filter(|&&l| l <= k).count() as f64 / n as f64
@@ -350,6 +356,50 @@ fn openers(net: &Network) {
             (0..n)
                 .filter(|&s| net.stations[s].lines & (1 << l) != 0)
                 .collect(),
+        );
+    }
+    println!("\nwith clues: best opener once the game has shown the mode");
+    let threads = std::thread::available_parallelism().map_or(4, |t| t.get());
+    for (m, name) in network::MODE_NAMES.iter().enumerate() {
+        let answers: Vec<usize> = (0..n)
+            .filter(|&a| solver::Clues::reveal(net, a, 0).mode == Some(m))
+            .collect();
+        let all: Vec<usize> = (0..n).collect();
+        let mut means: Vec<(f64, usize, usize)> = std::thread::scope(|scope| {
+            let handles: Vec<_> = all
+                .chunks(n.div_ceil(threads))
+                .map(|openers| {
+                    let answers = &answers;
+                    scope.spawn(move || {
+                        openers
+                            .iter()
+                            .map(|&o| {
+                                let lens: Vec<usize> = answers
+                                    .iter()
+                                    .map(|&a| solver::play(net, a, Some(o), true).len())
+                                    .collect();
+                                let mean = lens.iter().sum::<usize>() as f64 / lens.len() as f64;
+                                (mean, *lens.iter().max().unwrap_or(&0), o)
+                            })
+                            .collect::<Vec<_>>()
+                    })
+                })
+                .collect();
+            handles
+                .into_iter()
+                .flat_map(|h| h.join().unwrap())
+                .collect()
+        });
+        means.sort_by(|a, b| a.0.total_cmp(&b.0).then(a.1.cmp(&b.1)));
+        let top: Vec<String> = means
+            .iter()
+            .take(3)
+            .map(|&(mean, worst, o)| format!("{} {mean:.3} (worst {worst})", net.stations[o].name))
+            .collect();
+        println!(
+            "  {name:<15} {:>3} answers  {}",
+            answers.len(),
+            top.join(" · ")
         );
     }
     let mean_all = scores.iter().map(|s| s.mean).sum::<f64>() / n as f64;

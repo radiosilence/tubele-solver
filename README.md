@@ -59,6 +59,14 @@ was right; `ctrl-z` undoes a guess.
 whether their fare zones match, are adjacent or neither, and which of the guess's lines the answer
 is also on.
 
+**Service information.** The live board shows the answer's transport mode from the start, then
+reveals one more fact after each wrong guess: fare zone, its role on the network (end of the line,
+interchange or through station), one of its lines, stops from the end of that line, and its first
+letter. `auto` scrapes the panel and treats each fact as a hard constraint, computed from the local
+map: a station's role from its neighbour and line counts, and stops from the end by a breadth-first
+search from each line's ends along that line only. `demo` and `bench` reveal the same facts in the
+same order. `play` does not ask for them.
+
 **Elimination.** A station stays a candidate only if, had it been the answer, every previous guess
 would have produced exactly the clues observed. If the map here ever disagrees with the game's
 (TfL rerouting a line, say) and nothing fits exactly, the solver keeps the stations that disagree

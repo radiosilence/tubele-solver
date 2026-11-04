@@ -3,7 +3,8 @@
 //! would. Nothing from the game's code or data is used.
 
 use crate::network::{LINES, Network, line_name, normalise};
-use crate::solver::{Feedback, ZoneMatch};
+use crate::network::{MODE_NAMES, Role, line_full_name};
+use crate::solver::{Clues, Feedback, ZoneMatch};
 use anyhow::{Context, Result, anyhow, bail};
 use headless_chrome::protocol::cdp::Network as Cdp;
 use headless_chrome::{Browser, LaunchOptions, Tab};
@@ -23,6 +24,9 @@ pub struct Row {
     pub stops: Option<u8>,
     pub zone: Option<String>,
     pub lines: Vec<Pill>,
+    /// The service-information panel as it stands after this guess.
+    #[serde(skip)]
+    pub clues: Clues,
 }
 
 #[derive(Deserialize, Debug)]
@@ -70,7 +74,7 @@ impl Row {
 }
 
 pub enum Event {
-    Ready { puzzle: String },
+    Ready { puzzle: String, clues: Clues },
     Row(Result<Row>),
     Failed(String),
 }
@@ -100,6 +104,7 @@ impl Site {
             };
             let _ = worker_tx.send(Event::Ready {
                 puzzle: session.puzzle(),
+                clues: session.clues(),
             });
             for command in worker_rx {
                 let event = match command {
@@ -107,6 +112,7 @@ impl Site {
                     Command::NextRound => match session.next_round() {
                         Ok(()) => Event::Ready {
                             puzzle: session.puzzle(),
+                            clues: session.clues(),
                         },
                         Err(e) => Event::Failed(format!("{e:#}")),
                     },
@@ -227,6 +233,18 @@ impl Session {
             .unwrap_or(0) as usize)
     }
 
+    /// The service-information panel, parsed. Labels it does not recognise
+    /// are ignored, so a new kind of clue cannot break play.
+    fn clues(&self) -> Clues {
+        let js = "JSON.stringify([...document.querySelectorAll('.clues .clue')].map(c => [c.querySelector('dt')?.textContent.trim() ?? '', c.querySelector('dd')?.textContent.trim() ?? '']))";
+        let pairs: Vec<(String, String)> = self
+            .eval(js)
+            .ok()
+            .and_then(|v| v.as_str().and_then(|s| serde_json::from_str(s).ok()))
+            .unwrap_or_default();
+        parse_clues(&pairs)
+    }
+
     fn puzzle(&self) -> String {
         self.eval("document.querySelector('.strap')?.textContent ?? ''")
             .ok()
@@ -323,13 +341,80 @@ impl Session {
         })()"#;
         let json = self.eval(read)?;
         let text = json.as_str().context("feedback row did not read as text")?;
-        serde_json::from_str(text).context("reading the feedback row")
+        let mut row: Row = serde_json::from_str(text).context("reading the feedback row")?;
+        row.clues = self.clues();
+        Ok(row)
     }
+}
+
+/// Turn the panel's label/value pairs into clues.
+pub fn parse_clues(pairs: &[(String, String)]) -> Clues {
+    let mut clues = Clues::default();
+    for (label, value) in pairs {
+        let v = value.trim();
+        match label.as_str() {
+            "Mode" => clues.mode = MODE_NAMES.iter().position(|m| m.eq_ignore_ascii_case(v)),
+            "Fare zone" => {
+                clues.zones = Some(
+                    v.split(|c: char| !c.is_ascii_digit())
+                        .filter_map(|z| z.parse().ok())
+                        .collect(),
+                )
+            }
+            "On the network" => {
+                clues.role = match v {
+                    "End of the line" => Some(Role::Terminus),
+                    "A through station" => Some(Role::Through),
+                    "An interchange" | "Two stations, one name" => Some(Role::Interchange),
+                    _ => None,
+                }
+            }
+            "One of its lines" => {
+                let name = v.strip_suffix(" line").unwrap_or(v);
+                clues.line =
+                    (0..LINES.len()).find(|&l| normalise(line_full_name(l)) == normalise(name))
+            }
+            "From the end of the line" => {
+                clues.end_stops = if v == "It is the end of the line" {
+                    Some(0)
+                } else {
+                    v.split(' ').next().and_then(|n| n.parse().ok())
+                }
+            }
+            "First letter" => {
+                clues.letter = v.chars().find(|c| c.is_alphanumeric());
+            }
+            _ => {}
+        }
+    }
+    clues
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn parses_the_clue_panel() {
+        let pairs: Vec<(String, String)> = [
+            ("Mode", "Underground"),
+            ("Fare zone", "Zones 2 & 3"),
+            ("On the network", "Two stations, one name"),
+            ("One of its lines", "Hammersmith & City line"),
+            ("From the end of the line", "4 stops"),
+            ("First letter", "“B”"),
+        ]
+        .iter()
+        .map(|(a, b)| (a.to_string(), b.to_string()))
+        .collect();
+        let c = parse_clues(&pairs);
+        assert_eq!(c.mode, Some(3));
+        assert_eq!(c.zones, Some(vec![2, 3]));
+        assert_eq!(c.role, Some(Role::Interchange));
+        assert_eq!(c.line, Some(4));
+        assert_eq!(c.end_stops, Some(4));
+        assert_eq!(c.letter, Some('B'));
+    }
 
     /// Plays one real guess at tubele.app. Run with `cargo test -- --ignored`.
     #[test]
@@ -344,19 +429,25 @@ mod tests {
         assert!(!row.lines.is_empty());
     }
 
+    /// Plays one board with the solver, using the rows and the clue panel,
+    /// then checks the answer agrees with every clue the page showed.
     fn play_out(net: &Network, session: &Session) -> Vec<crate::solver::Observation> {
         println!("puzzle: {}", session.puzzle());
         let mut obs = Vec::new();
+        let mut seen = vec![session.clues()];
         for _ in 0..6 {
-            let guess = crate::solver::analyse(net, &obs, &[]).ranked[0].station;
-            let feedback = session
-                .guess(&net.stations[guess].name)
-                .unwrap()
-                .feedback(net, guess)
-                .unwrap();
+            let clues = seen.last().unwrap();
+            println!("  clues: {clues:?}");
+            let guess = crate::solver::analyse(net, &obs, &[], clues).ranked[0].station;
+            let row = session.guess(&net.stations[guess].name).unwrap();
+            let feedback = row.feedback(net, guess).unwrap();
             println!("{} -> {feedback:?}", net.stations[guess].name);
+            seen.push(row.clues);
             obs.push(crate::solver::Observation { guess, feedback });
             if feedback.is_win() {
+                for c in &seen {
+                    assert_eq!(c.violations(net, guess), 0, "answer contradicts {c:?}");
+                }
                 break;
             }
         }
