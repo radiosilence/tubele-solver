@@ -135,7 +135,7 @@ fn find(net: &Network, name: &str) -> Result<usize> {
 fn bench(net: &Network) {
     let opener = solver::analyse(net, &[], &[]).ranked[0].station;
     println!("opening guess: {}", net.stations[opener].name);
-    let mut histogram = vec![0usize; 21];
+    let mut histogram = [0usize; 21];
     let mut worst = Vec::new();
     for answer in 0..net.len() {
         let game = solver::play(net, answer, Some(opener));

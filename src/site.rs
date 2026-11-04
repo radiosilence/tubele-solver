@@ -348,11 +348,11 @@ mod tests {
         println!("puzzle: {}", session.puzzle());
         let mut obs = Vec::new();
         for _ in 0..6 {
-            let guess = crate::solver::analyse(&net, &obs, &[]).ranked[0].station;
+            let guess = crate::solver::analyse(net, &obs, &[]).ranked[0].station;
             let feedback = session
                 .guess(&net.stations[guess].name)
                 .unwrap()
-                .feedback(&net, guess)
+                .feedback(net, guess)
                 .unwrap();
             println!("{} -> {feedback:?}", net.stations[guess].name);
             obs.push(crate::solver::Observation { guess, feedback });
