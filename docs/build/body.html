@@ -15,7 +15,7 @@
   <h1>Solving Tubele by version-space search on the London rail graph</h1>
   <p class="sub">Adaptive identification of one station among 420, with an exact consistency filter, a collision-entropy objective, counting lower bounds it nearly meets, and a comparison with 13,030 human games.</p>
   <aside class="origin" aria-label="About the game">
-    <p><b>Inspired by Tubele.</b> This report is about <a href="https://tubele.app">Tubele</a>, a daily London station guessing game made by <a href="https://mikekeefe.com">Mike Keefe</a>. It began as an attempt to see how well a program could play his game using only what the game shows a player. Play the original at <a href="https://tubele.app">tubele.app</a>, and see more of Mike's work at <a href="https://mikekeefe.com">mikekeefe.com</a>.</p>
+    <p><b>Inspired by Tubele.</b> This report is about <a href="https://tubele.app">Tubele</a>, a daily London station guessing game made by <a href="https://mikekeefe.com">Mike Keefe</a>. It began as an attempt to see how well a program could play his game using only what the game shows a player. Play the original at <a href="https://tubele.app">tubele.app</a>, read Mike's account of <a href="https://mikekeefe.com/work/tubele">how he built it</a>, and see more of his work at <a href="https://mikekeefe.com">mikekeefe.com</a>.</p>
   </aside>
   <div class="byline"><span>Code: <a href="https://github.com/radiosilence/tubele-solver">github.com/radiosilence/tubele-solver</a></span><span>Game: <a href="https://tubele.app">tubele.app</a> by <a href="https://mikekeefe.com">Mike Keefe</a></span><span>Data from TfL Open Data</span></div>
 </header>
@@ -60,6 +60,8 @@
 <h2><span class="n">1</span>Introduction</h2>
 
 <p>Tubele is a daily puzzle in the family of Wordle: one hidden answer, a small budget of guesses, structured feedback after each. Its answer space is the 420 stations of four London rail networks and its feedback is geometric. A guess reports how many stops separate it from the answer along the network, whether its fare zone matches, and which of its lines also serve the answer. Unlike Wordle, whose feedback alphabet is fixed at $3^5$, Tubele's alphabet is induced by the graph: a guess's power to discriminate depends on where it sits, how many lines meet there, and how the network fans out around it. The question this report answers is how well a machine that knows only the map, and plays only through the game's own interface, can do, and how that compares with people.</p>
+
+<p>The game is Mike Keefe's, and the problem studied here exists because of one of his design decisions. As he describes in <a href="https://mikekeefe.com/work/tubele">his write-up of the build</a>, he rejected the compass bearing and straight-line distance that similar games report, judging them useless to a player, in favour of the number of stops between guess and answer along the network, computed by treating TfL's route data as a graph. That choice makes the feedback a graph metric and the game a search problem on the network, which is the whole subject of this report. He also built the data pipeline that snapshots stations and routes from the TfL API; the station-merging conventions in §3 follow it, so that distances here agree with the game's. The service-information panel analysed in §5 and the aggregate statistics analysed in §§7–8 are likewise his work; the latter come from the game's own analytics dashboard.</p>
 
 <p>The solver (<code>src/solver.rs</code>) is short. Its interest lies in the analysis: why a one-step greedy rule is so close to optimal on this graph, which openers are best and why, what the progressive clues are worth, and where human play loses its efficiency. Every number in this report is computed from the network on the page or in a build step from the same code, and every figure is interactive. Click a station on any map to make it the subject of every linked figure.</p>
 
@@ -463,8 +465,15 @@ PLAY(answer, opener)
 <h2><span class="n">C</span>Appendix: data pipeline and reproducibility</h2>
 <p>The network is rebuilt with <code>tubele-solver fetch</code>. The map-only results in §6 come from <code>tubele-solver bench</code> and <code>tubele-solver openers</code>; the live behaviour from <code>cargo test -- --ignored</code>, which plays the daily game and a practice round through the browser. The figures here are computed by <code>build/build.js</code> beside this page from <code>data/network.json</code>, using a port of the solver (<code>build/solver.js</code>) whose map-only results match the Rust binary up to floating-point tie-breaking. Human statistics are aggregate counts read from the game's dashboard.</p>
 
+<h2><span class="n">★</span>Acknowledgements</h2>
+
+<p>Tubele was designed and built by <a href="https://mikekeefe.com">Mike Keefe</a>; play it at <a href="https://tubele.app">tubele.app</a> and read about its construction at <a href="https://mikekeefe.com/work/tubele">mikekeefe.com/work/tubele</a>. This report would not exist without the game, its graph-distance feedback, its open-data pipeline and the play statistics it records. Station and route data are from TfL Open Data. Any errors in the analysis are the author's own.</p>
+
 <h2><span class="n">R</span>References</h2>
 <ol class="refs">
+  <li>Keefe, M. (2026). <em>Tubele</em>: guess the London station. <a href="https://tubele.app">tubele.app</a>.</li>
+  <li>Keefe, M. (2026). Tubele (project write-up). <a href="https://mikekeefe.com/work/tubele">mikekeefe.com/work/tubele</a>.</li>
+  <li>Keefe, M. (2026). Tubele source code. <a href="https://github.com/mike-keefe/tubele">github.com/mike-keefe/tubele</a>.</li>
   <li>Hyafil, L. and Rivest, R. L. (1976). Constructing optimal binary decision trees is NP-complete. <em>Information Processing Letters</em> 5(1), 15–17.</li>
   <li>Knuth, D. E. (1976). The computer as Master Mind. <em>Journal of Recreational Mathematics</em> 9(1), 1–6.</li>
   <li>Mitchell, T. M. (1982). Generalization as search. <em>Artificial Intelligence</em> 18(2), 203–226.</li>
