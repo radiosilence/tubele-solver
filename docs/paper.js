@@ -742,7 +742,7 @@
     paint();
     // Reference implementation's results, for comparison.
     document.getElementById('modeopen').innerHTML = `<thead><tr><th>mode shown</th><th class="n">answers</th><th>best opener, this page</th><th class="n">mean</th><th>best opener, reference solver</th><th class="n">mean</th></tr></thead><tbody>` +
-      [['Underground', "King's Cross St. Pancras", '2.294'], ['Overground', 'Clapham Junction', '2.237'], ['DLR', 'Devons Road', '2.268'], ['Elizabeth line', 'Brentwood, Chadwell Heath, Forest Gate', '2.032']]
+      [['Underground', "King's Cross St. Pancras", '2.294'], ['Overground', 'Clapham Junction', '2.237'], ['DLR', 'Devons Road', '2.268'], ['Elizabeth line', 'Brentwood, Chadwell Heath, Forest Gate and seven others, tied', '2.032']]
         .map(([m, r, rm]) => { const M = D.adaptive.byMode[m]; const ties = M.top.filter(t => Math.abs(t.mean - M.top[0].mean) < 1e-9); return `<tr><td>${m}</td><td class="n">${M.size}</td><td>${ties.map(t => NAME(t.s)).join(', ')}</td><td class="n">${f3(M.top[0].mean)}</td><td>${r}</td><td class="n">${rm}</td></tr>`; }).join('') + '</tbody>';
   })();
 
