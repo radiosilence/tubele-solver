@@ -7,16 +7,31 @@ and nothing else: not the answer schedule, not which stations the game favours a
 guess returns what the game shows a player, and the solver keeps only the stations consistent with
 every clue so far.
 
+## Install
+
+```bash
+brew install radiosilence/tap/tubele-solver
+# or
+mise use -g github:radiosilence/tubele-solver
+```
+
+Releases carry macOS arm64 and static Linux binaries. Shell completions come with the Homebrew
+formula; otherwise `tubele-solver --completions zsh` (or bash, fish, elvish, powershell) prints
+one.
+
 ## Usage
 
 ```bash
-cargo run --release                         # play today's game at tubele.app by itself
-cargo run --release -- auto --start Bank    # …opening with a chosen station
-cargo run --release -- auto --show          # …with the browser window visible
-cargo run --release -- play                 # play it yourself, typing in what the game says
-cargo run --release -- demo [station]       # watch it solve a hidden station offline
-cargo run --release -- bench                # play every station and report the spread
-cargo run --release -- fetch                # rebuild data/network.json from TfL
+tubele-solver                               # play today's game at tubele.app by itself
+tubele-solver auto --start Bank             # …opening with a chosen station
+tubele-solver auto --start zone:2           # …opening with a random zone 2 station
+tubele-solver auto --practice 10            # …then ten practice rounds
+tubele-solver auto --show                   # …with the browser window visible
+tubele-solver play                          # play it yourself, typing in what the game says
+tubele-solver demo [station]                # watch it solve a hidden station offline
+tubele-solver bench                         # play every station and report the spread
+tubele-solver openers                       # rank every station as an opening guess
+tubele-solver fetch                         # rebuild data/network.json from TfL
 ```
 
 `auto` drives the live site in a headless Chromium-based browser (Chrome, Helium, Brave, Edge or a
@@ -28,6 +43,11 @@ analytics endpoint are blocked so the solver's games do not count in its statist
 Without `--start`, choose the opener in the UI: enter takes the solver's pick, typing searches,
 `1`–`9` picks a random station in that fare zone and `?` a random station anywhere. The solver
 plays the rest. `tab` switches the map between the remaining candidates and the whole network.
+
+Practice rounds unlock once the daily game is finished, so `--practice` plays the daily first and
+then asks the page for another round each time; `n` does the same by hand. Later rounds open with
+`--start` if given (drawn afresh for `random` and `zone:N`), otherwise with the solver's pick. The
+header keeps a running tally.
 
 In `play`, enter what the game reported after each guess: stops away, the zone colour (`e` same,
 `n` adjacent, `x` neither), and a letter for each line marked as shared. `0` stops means the guess
@@ -53,6 +73,13 @@ answer.
 
 With a uniform prior over all stations, the bench solves every station within five guesses and
 averages about 2.7.
+
+**Openers.** `openers` plays every station as the opener against every station as the answer,
+with the solver taking over from guess two, all offline on the local map. Stratford is best on
+average (2.71 guesses): its five lines reach most of the network within a few stops, so the stop
+count alone splits the field finely. Liverpool Street, Bank, Canary Wharf and Barking are slightly
+worse on average but never need a fifth guess. Openers at the ends of lines are the weakest; from
+Chesham most of the network sits at similar distances, so the first clue rules out little.
 
 **The map.** `fetch` follows the same conventions as the game: stops sharing a cleaned name within
 600 m are one station (King's Cross St Pancras, Paddington's H&C platforms), while the two Edgware

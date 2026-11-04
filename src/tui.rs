@@ -52,16 +52,36 @@ pub enum Referee {
 
 enum LiveState {
     Connecting,
-    Ready(String),
-    Error(String),
+    Ready,
+    Failed(String),
+}
+
+/// How each game opens, when chosen on the command line.
+#[derive(Clone, Copy)]
+pub enum Opener {
+    Station(usize),
+    /// A random station, from one fare zone if given. Drawn afresh each round.
+    Random(Option<u8>),
+}
+
+struct RoundResult {
+    puzzle: String,
+    guesses: usize,
+    won: bool,
 }
 
 struct App {
     net: Network,
     referee: Referee,
     live: LiveState,
-    /// Opening guess chosen on the command line.
-    opener: Option<usize>,
+    /// The label the page gives the current board: "No. 82" or "Practice".
+    puzzle: String,
+    /// Something worth telling the player that did not stop play.
+    notice: Option<String>,
+    opener: Option<Opener>,
+    /// Practice rounds still to play after the current game.
+    practice_left: usize,
+    results: Vec<RoundResult>,
     obs: Vec<Observation>,
     /// Stations the live game did not recognise; never guessed again.
     skip: Vec<usize>,
@@ -72,8 +92,9 @@ struct App {
     last_step: Instant,
 }
 
-pub fn run(net: Network, referee: Referee, opener: Option<usize>) -> Result<()> {
+pub fn run(net: Network, referee: Referee, opener: Option<Opener>, practice: usize) -> Result<()> {
     let mut app = App::new(net, referee, opener);
+    app.practice_left = practice;
     let mut terminal = ratatui::init();
     let result = app.event_loop(&mut terminal);
     ratatui::restore();
@@ -94,14 +115,18 @@ fn random_below(n: usize) -> usize {
 }
 
 impl App {
-    fn new(net: Network, referee: Referee, opener: Option<usize>) -> Self {
+    fn new(net: Network, referee: Referee, opener: Option<Opener>) -> Self {
         let analysis = solver::analyse(&net, &[], &[]);
         let live = matches!(referee, Referee::Live(_));
         Self {
             net,
             referee,
             live: LiveState::Connecting,
+            puzzle: String::new(),
+            notice: None,
             opener,
+            practice_left: 0,
+            results: Vec::new(),
             obs: Vec::new(),
             skip: Vec::new(),
             analysis,
@@ -129,6 +154,12 @@ impl App {
                 }
             } else if self.autoplay && self.last_step.elapsed() > Duration::from_millis(900) {
                 self.step();
+            } else if matches!(self.stage, Stage::Done)
+                && self.practice_left > 0
+                && self.last_step.elapsed() > Duration::from_millis(2500)
+            {
+                self.practice_left -= 1;
+                self.next_round();
             }
         }
     }
@@ -138,7 +169,7 @@ impl App {
     }
 
     fn ready(&self) -> bool {
-        !self.is_live() || matches!(self.live, LiveState::Ready(_))
+        !self.is_live() || matches!(self.live, LiveState::Ready)
     }
 
     fn poll_site(&mut self) {
@@ -150,11 +181,12 @@ impl App {
         };
         match event {
             SiteEvent::Ready { puzzle } => {
-                self.live = LiveState::Ready(puzzle);
+                self.puzzle = puzzle;
+                self.live = LiveState::Ready;
                 self.last_step = Instant::now();
             }
             SiteEvent::Failed(e) => {
-                self.live = LiveState::Error(e);
+                self.live = LiveState::Failed(e);
                 self.autoplay = false;
             }
             SiteEvent::Row(row) => {
@@ -165,7 +197,7 @@ impl App {
                     Ok(feedback) => self.commit(Observation { guess, feedback }),
                     Err(e) => {
                         // The game did not take this station; rule it out and carry on.
-                        self.live = LiveState::Error(format!("{e:#}"));
+                        self.notice = Some(format!("{e:#}"));
                         self.skip.push(guess);
                         self.analysis = solver::analyse(&self.net, &self.obs, &self.skip);
                         self.stage = Stage::Pick {
@@ -221,7 +253,31 @@ impl App {
             };
         if matches!(self.stage, Stage::Done) {
             self.autoplay = false;
+            self.results.push(RoundResult {
+                puzzle: self.puzzle.clone(),
+                guesses: self.obs.len(),
+                won: obs.feedback.is_win(),
+            });
         }
+    }
+
+    /// Start a fresh practice board on the live site.
+    fn next_round(&mut self) {
+        let Referee::Live(site) = &self.referee else {
+            return;
+        };
+        site.next_round();
+        self.live = LiveState::Connecting;
+        self.notice = None;
+        self.obs.clear();
+        self.skip.clear();
+        self.analysis = solver::analyse(&self.net, &[], &[]);
+        self.stage = Stage::Pick {
+            query: String::new(),
+            cursor: 0,
+        };
+        self.autoplay = true;
+        self.last_step = Instant::now();
     }
 
     fn undo(&mut self) {
@@ -254,9 +310,6 @@ impl App {
             Referee::Live(site) => {
                 site.guess(&self.net.stations[station].name);
                 self.stage = Stage::Waiting(station);
-                if matches!(self.live, LiveState::Error(_)) {
-                    self.live = LiveState::Ready(String::new());
-                }
             }
             Referee::Manual => {
                 self.stage = Stage::Feedback {
@@ -275,11 +328,16 @@ impl App {
             return;
         }
         if self.obs.is_empty() && self.skip.is_empty() {
-            match self.opener {
-                Some(o) => return self.guess(o),
-                // In live play the player picks the opener unless one was given.
-                None if self.is_live() => return,
-                None => {}
+            let pick = match self.opener {
+                Some(Opener::Station(o)) => Some(o),
+                Some(Opener::Random(zone)) => self.random_station(zone),
+                // In live play the player picks the first opener unless one
+                // was given; later rounds take the solver's pick.
+                None if self.is_live() && self.results.is_empty() => return,
+                None => None,
+            };
+            if let Some(o) = pick {
+                return self.guess(o);
             }
         }
         if let Some(s) = self.suggestion() {
@@ -312,6 +370,7 @@ impl App {
             Stage::Done => match key.code {
                 KeyCode::Char('q') | KeyCode::Esc | KeyCode::Enter => return false,
                 KeyCode::Char('u') | KeyCode::Backspace => self.undo(),
+                KeyCode::Char('n') => self.next_round(),
                 _ => {}
             },
             Stage::Pick { query, cursor } => match key.code {
@@ -498,16 +557,16 @@ impl App {
                     Span::styled("opening tubele.app…", Style::new().fg(MUTED)),
                 ]);
             }
-            (Referee::Live(_), LiveState::Ready(puzzle)) => {
+            (Referee::Live(_), LiveState::Ready) => {
                 spans.extend([
                     dot(),
                     Span::styled(
-                        format!("live on tubele.app {puzzle}"),
+                        format!("live on tubele.app · {}", self.puzzle),
                         Style::new().fg(Color::Rgb(0x5b, 0xbd, 0x72)),
                     ),
                 ]);
             }
-            (Referee::Live(_), LiveState::Error(e)) => {
+            (Referee::Live(_), LiveState::Failed(e)) => {
                 spans.extend([
                     dot(),
                     Span::styled(
@@ -520,6 +579,37 @@ impl App {
         }
         if self.autoplay && !matches!(self.stage, Stage::Done) {
             spans.push(Span::styled(" ▶ auto", Style::new().fg(SUGGEST)));
+        }
+        if !self.results.is_empty() {
+            let won: Vec<&RoundResult> = self.results.iter().filter(|r| r.won).collect();
+            let mean =
+                won.iter().map(|r| r.guesses).sum::<usize>() as f64 / won.len().max(1) as f64;
+            spans.extend([
+                dot(),
+                Span::styled(
+                    format!(
+                        "{} played, {} solved, {mean:.2} avg",
+                        self.results.len(),
+                        won.len()
+                    ),
+                    Style::new().fg(ACCENT),
+                ),
+            ]);
+            if self.practice_left > 0 {
+                spans.push(Span::styled(
+                    format!(" ({} to go)", self.practice_left),
+                    Style::new().fg(MUTED),
+                ));
+            }
+        }
+        if let Some(n) = &self.notice {
+            spans.extend([
+                dot(),
+                Span::styled(
+                    format!("⚠ {n}"),
+                    Style::new().fg(Color::Rgb(0xff, 0x8c, 0x42)),
+                ),
+            ]);
         }
         if self.analysis.mismatch > 0 {
             spans.push(Span::styled(
@@ -705,6 +795,21 @@ impl App {
                 ),
             };
             lines.push(line);
+            if self.results.len() > 1 {
+                lines.push(Line::default());
+                let shown = self.results.len().saturating_sub(5);
+                for r in &self.results[shown..] {
+                    let score = if r.won {
+                        format!("{}/{MAX_GUESSES}", r.guesses)
+                    } else {
+                        format!("X/{MAX_GUESSES}")
+                    };
+                    lines.push(Line::from(vec![
+                        Span::styled(format!("{:<12}", r.puzzle), Style::new().fg(MUTED)),
+                        Span::styled(score, Style::new().fg(if r.won { ACCENT } else { MUTED })),
+                    ]));
+                }
+            }
         } else {
             lines.push(Line::from(vec![
                 Span::styled(format!("{:<22}", "station"), Style::new().fg(FAINT)),
@@ -944,15 +1049,23 @@ impl App {
                     Line::from(vec![key("tab"), hint("map"), key("esc"), hint("quit")]),
                 ],
             ),
-            Stage::Done => (
-                "done",
-                vec![Line::from(vec![
-                    key("enter"),
-                    hint("quit"),
-                    key("u"),
-                    hint("undo"),
-                ])],
-            ),
+            Stage::Done => {
+                let mut help = vec![key("enter"), hint("quit")];
+                if self.is_live() {
+                    help.extend([key("n"), hint("practice round")]);
+                } else {
+                    help.extend([key("u"), hint("undo")]);
+                }
+                let status = if self.practice_left > 0 {
+                    Line::styled(
+                        format!("next practice round starting… {} to go", self.practice_left),
+                        Style::new().fg(SUGGEST),
+                    )
+                } else {
+                    Line::default()
+                };
+                ("done", vec![status, Line::default(), Line::from(help)])
+            }
         };
         f.render_widget(Paragraph::new(lines).block(Self::panel(title)), area);
     }

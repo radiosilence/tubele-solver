@@ -77,13 +77,18 @@ pub enum Event {
 
 /// Handle to the browser thread. Send a station name; a `Row` comes back.
 pub struct Site {
-    tx: Sender<String>,
+    tx: Sender<Command>,
     pub rx: Receiver<Event>,
+}
+
+enum Command {
+    Guess(String),
+    NextRound,
 }
 
 impl Site {
     pub fn launch(show: bool) -> Self {
-        let (tx, worker_rx) = channel::<String>();
+        let (tx, worker_rx) = channel::<Command>();
         let (worker_tx, rx) = channel();
         thread::spawn(move || {
             let session = match Session::open(show) {
@@ -96,8 +101,17 @@ impl Site {
             let _ = worker_tx.send(Event::Ready {
                 puzzle: session.puzzle(),
             });
-            for name in worker_rx {
-                if worker_tx.send(Event::Row(session.guess(&name))).is_err() {
+            for command in worker_rx {
+                let event = match command {
+                    Command::Guess(name) => Event::Row(session.guess(&name)),
+                    Command::NextRound => match session.next_round() {
+                        Ok(()) => Event::Ready {
+                            puzzle: session.puzzle(),
+                        },
+                        Err(e) => Event::Failed(format!("{e:#}")),
+                    },
+                };
+                if worker_tx.send(event).is_err() {
                     break;
                 }
             }
@@ -106,7 +120,13 @@ impl Site {
     }
 
     pub fn guess(&self, name: &str) {
-        let _ = self.tx.send(name.to_string());
+        let _ = self.tx.send(Command::Guess(name.to_string()));
+    }
+
+    /// Start a practice round. The game only offers one once the current
+    /// board is finished.
+    pub fn next_round(&self) {
+        let _ = self.tx.send(Command::NextRound);
     }
 }
 
@@ -169,6 +189,7 @@ impl Session {
                 .map_err(|e| anyhow!(e))?,
         )?;
         let tab = browser.new_tab()?;
+        tab.set_default_timeout(Duration::from_secs(15));
         // Keep the solver's games out of the game's analytics.
         tab.call_method(Cdp::Enable {
             max_total_buffer_size: None,
@@ -213,10 +234,41 @@ impl Session {
             .unwrap_or_default()
     }
 
+    fn next_round(&self) -> Result<()> {
+        let click = r#"(() => {
+            const b = [...document.querySelectorAll('button')]
+                .find(b => /^(Practice round|Another round)$/.test(b.textContent.trim()));
+            if (!b) return false;
+            b.click();
+            return true;
+        })()"#;
+        if self.eval(click)? != serde_json::Value::Bool(true) {
+            bail!("the page offers no practice round yet");
+        }
+        let deadline = Instant::now() + Duration::from_secs(5);
+        loop {
+            let fresh = self.eval(
+                "document.querySelectorAll('li.row').length === 0 && !!document.querySelector('.entry-input')",
+            )?;
+            if fresh == serde_json::Value::Bool(true) {
+                break;
+            }
+            if Instant::now() > deadline {
+                bail!("the practice board did not appear");
+            }
+            thread::sleep(Duration::from_millis(100));
+        }
+        // Close the result card if it is still open over the board.
+        self.tab.press_key("Escape")?;
+        Ok(())
+    }
+
     fn guess(&self, name: &str) -> Result<Row> {
         let before = self.rows()?;
-        let input = self.tab.wait_for_element(".entry-input")?;
-        input.click()?;
+        self.tab.wait_for_element(".entry-input")?;
+        // Focused from script: a CDP click waits for layout to settle, which
+        // can stall after the board is swapped for a practice round.
+        self.eval("document.querySelector('.entry-input').focus()")?;
         self.tab.type_str(name)?;
 
         // Pick the suggestion whose text is exactly this station.
@@ -292,12 +344,7 @@ mod tests {
         assert!(!row.lines.is_empty());
     }
 
-    /// Plays a whole live game with the solver and nothing else.
-    #[test]
-    #[ignore]
-    fn solves_the_live_game() {
-        let net = Network::embedded();
-        let session = Session::open(false).unwrap();
+    fn play_out(net: &Network, session: &Session) -> Vec<crate::solver::Observation> {
         println!("puzzle: {}", session.puzzle());
         let mut obs = Vec::new();
         for _ in 0..6 {
@@ -313,6 +360,18 @@ mod tests {
                 break;
             }
         }
-        assert!(obs.last().unwrap().feedback.is_win());
+        obs
+    }
+
+    /// Plays the daily game, then a practice round, with the solver and nothing else.
+    #[test]
+    #[ignore]
+    fn solves_daily_then_practice() {
+        let net = Network::embedded();
+        let session = Session::open(false).unwrap();
+        assert!(play_out(&net, &session).last().unwrap().feedback.is_win());
+        session.next_round().unwrap();
+        assert_eq!(session.puzzle(), "Practice");
+        assert!(play_out(&net, &session).last().unwrap().feedback.is_win());
     }
 }

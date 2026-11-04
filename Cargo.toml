@@ -2,10 +2,14 @@
 name = "tubele-solver"
 version = "0.1.0"
 edition = "2024"
+description = "Solves Tubele, the daily London station guessing game, by guessing and elimination on the TfL network"
+license = "MIT"
+repository = "https://github.com/radiosilence/tubele-solver"
 
 [dependencies]
 anyhow = "1.0.104"
 clap = { version = "4.6.7", features = ["derive"] }
+clap_complete = "4.6.11"
 crossterm = "0.29.0"
 headless_chrome = "1.0.22"
 ratatui = "0.30.2"
