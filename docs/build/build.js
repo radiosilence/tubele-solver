@@ -196,6 +196,37 @@ for (const v of Object.values(human)) v.fit = fitBits(v.counts, v.losses);
 // distances players see on their first guess.
 const kxDist = new Array(40).fill(0); for (let a = 0; a < N; a++) kxDist[net.dist[kx * N + a]]++;
 
+// ── Behavioural baselines: the solver's per-guess distances ──
+function playSeq(answer, opener, useClues) {
+  let C = useClues ? all.filter(v => clue[0][v] === clue[0][answer]) : all.slice();
+  let g = opener ?? S.rank(net, C, [])[0].station;
+  const seq = [], guessed = []; let wrong = 0;
+  for (let t = 0; t < 12; t++) {
+    const k = S.fb(net, g, answer); seq.push(net.dist[g * N + answer]);
+    if (S.isWin(k)) break;
+    C = S.partition(net, g, C).get(k); guessed.push(g); wrong++;
+    if (useClues && wrong <= 5) C = C.filter(v => clue[wrong][v] === clue[wrong][answer]);
+    g = S.rank(net, C, guessed)[0].station;
+  }
+  return seq;
+}
+function byGuess(seqs) {
+  const out = [];
+  for (let t = 0; t < 6; t++) {
+    const ds = seqs.filter(s => s.length > t).map(s => s[t]);
+    if (!ds.length) break;
+    const band = [0, 0, 0, 0, 0]; ds.forEach(d => band[d === 0 ? 0 : d <= 2 ? 1 : d <= 5 ? 2 : d <= 10 ? 3 : 4]++);
+    out.push({ t: t + 1, n: ds.length, mean: ds.reduce((a, b) => a + b, 0) / ds.length, band });
+  }
+  return out;
+}
+const behaviour = {
+  solverMap: byGuess(all.map(a => playSeq(a, stratford, false))),
+  solverClues: byGuess(all.map(a => playSeq(a, null, true))),
+  kxUniformMean: all.reduce((s, a) => s + net.dist[kx * N + a], 0) / N,
+  zoneDifficulty: (() => { const groups = { 'Zone 1': [], 'Zone 2': [], 'Zones 3–4': [], 'Zones 5–6': [], 'Zone 7+ or outside': [] }; const L = stratfordTree.lengths; all.forEach(i => { const z = raw.stations[i].zones[0]; const key = z === 1 ? 'Zone 1' : z === 2 ? 'Zone 2' : z <= 4 ? 'Zones 3–4' : z <= 6 ? 'Zones 5–6' : 'Zone 7+ or outside'; groups[z ? key : 'Zone 7+ or outside'].push(i); }); return Object.entries(groups).map(([k, ids]) => ({ k, n: ids.length, map: ids.reduce((s, i) => s + L[i], 0) / ids.length, clues: ids.reduce((s, i) => s + adaptive.lengths[i], 0) / ids.length })); })(),
+};
+
 // Compact tree for the icicle: guess index, class size, children.
 function compact(n) { return n.win ? { w: 1 } : { g: n.guess, n: n.size, c: n.children.map(c => c.win ? { w: 1 } : compact(c)) }; }
 
@@ -210,6 +241,8 @@ const out = {
   stratfordLengths: stratfordTree.lengths,
   kxLengths: kxTree.lengths,
   clues, perStation,
+  behaviour,
+  stats: Object.fromEntries(['daily', 'practice'].map(k => { const s = JSON.parse(fs.readFileSync(path.join(__dirname, 'stats', k + '-behaviour.json'), 'utf8')); return [k, Object.fromEntries(['kpi', 'funnel', 'guess_distribution', 'duration_distribution', 'time_of_day', 'new_vs_returning', 'win_rate_by_tier', 'stops_away_by_guess', 'stops_bands_by_guess', 'opening_stations', 'share_rate', 'share_method', 'day_n_return', 'returning_players', 'abandoned_games', 'guide_views'].map(q => [q, s[q]]))]; })),
   clue, adaptive, infoBound, clueBound, bmax, human, kxDist: kxDist.slice(0, 35),
   built: new Date().toISOString().slice(0, 10),
 };

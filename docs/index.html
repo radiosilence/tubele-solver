@@ -247,6 +247,7 @@ tr.sel td { background: color-mix(in oklab, var(--signal) 12%, transparent); }
   <li>A proof that the greedy objective is the collision probability of the feedback partition, $\mathbb{E}|C'| = |C|\,2^{-H_2} - [g\in C]/|C|$ (Theorem 1), and two lower bounds on expected guesses: an information bound and a sharper second-order counting bound (§4).</li>
   <li>Complete results for every opener, with and without clues, by mode and by line, and the full decision trees (§6).</li>
   <li>A comparison with 13,030 recorded human games, including a maximum-likelihood estimate of human information per guess (§7).</li>
+  <li>A behavioural analysis of how people play (§8): seven hypotheses on anchoring, use of feedback, clues, familiarity, learning, effort and sharing, each tested against the game&#39;s aggregate data with a matched machine baseline.</li>
 </ol>
 
 <h3>Notation</h3>
@@ -529,17 +530,121 @@ Its state space is the set of reachable candidate sets, its branching is $n$ per
 
 <p>The reason is not the choice of opener, which people get right, but what happens after it. The shared-line component is a set intersection over up to five lines, and combining it with a distance and a zone reading across a 420-station map, then choosing a second guess that trilaterates (Lemma 2), is the work the version space does without effort.</p>
 
-<h2><span class="n">8</span>Discussion</h2>
+<h2><span class="n">8</span>How people play</h2>
+
+<p>This section treats the game's dashboard as a behavioural dataset and asks what it reveals about the strategies of the people who generate it. The data are aggregates: counts by guess index, by distance band, by cohort, by hour and by outcome, for 9,550 daily and 4,522 practice games started, with no per-player traces and no answers. Each hypothesis below is stated before the evidence, tested against it with the statistic named, and compared with the solver's behaviour on the same graph where a comparison is meaningful. Two-sample comparisons of proportions use the pooled two-proportion $z$-test; intervals are Wilson 95% intervals. With samples in the thousands, almost every difference is significant, so effect sizes are what carry the argument.</p>
+
+<h3>8.1 Anchoring on salient hubs</h3>
+
+<div class="def"><b>Hypothesis B1 (salience).</b> Players choose openers by familiarity rather than by information, so openers concentrate on a few prominent Zone 1 interchanges far beyond what opener quality warrants.</div>
+
+<section class="exhibit wide" id="ex-conc">
+  <div class="plate"><span class="no">Exhibit 18</span><span class="label">Who opens where, and how good it is</span>
+    <span class="toggle" role="group" aria-label="Puzzle type"><button type="button" id="conc-daily" aria-pressed="true">daily</button><button type="button" id="conc-prac" aria-pressed="false">practice</button></span></div>
+  <div class="fig"><svg id="concchart" role="img" aria-label="Opening stations by frequency with solver quality"></svg><details><summary>table</summary><div class="scroll"><table id="conctable"></table></div></details></div>
+  <p class="plaque">The fifteen most common openers, by share of all first guesses (bars), with the solver's mean guesses from that opener (dots, right panel; dashed: the best opener, dotted: the mean over all openers). A uniform choice would give each station 0.24% of opens.</p>
+</section>
+
+<p id="b1-text"></p>
+
+<p>The evidence supports B1 in its first half and refutes it in its second. Openers are extremely concentrated, but the concentration falls on stations that are also good openers: weighted by use, the listed openers average <span data-v="b.oq"></span> guesses under the solver's policy against <span data-v="b.oqr"></span> for a random opener, which places the typical human opener in the best <span data-v="b.oqpct"></span> of all stations. Salience and quality coincide on this network because the busiest interchanges are also the best-connected vertices of the graph. Anchoring costs players little at the first guess.</p>
+
+<h3>8.2 Do players use the feedback?</h3>
+
+<div class="def"><b>Hypothesis B2 (partial use).</b> Players respond to the distance reading, moving closer to the answer on each guess, but do not maintain the full version space; their distance to the answer therefore falls slowly and roughly linearly, where a consistent player's collapses after two guesses.</div>
+
+<section class="exhibit wide" id="ex-dg">
+  <div class="plate"><span class="no">Exhibit 19</span><span class="label">Distance to the answer, guess by guess</span></div>
+  <div class="fig"><div class="legend" id="dglegend"></div><svg id="dgchart" role="img" aria-label="Mean distance to the answer by guess index"></svg></div>
+  <p class="plaque">Mean stops between each guess and the answer, by guess number, over the games that reach that guess (a correct guess counts as 0). The solver's curves use uniform answers; the daily curve sits lower partly because daily answers are more central (8.4).</p>
+</section>
+
+<p>The pattern in Exhibit 19 is the signature of B2. Daily players' mean distance falls from 6.22 stops at the first guess to 5.24, 4.31 and 3.53, then stalls at 3.55 on the fifth guess and reaches only 3.07 on the sixth; practice players fall from 8.84 to 4.98 over six guesses and are flat from the fourth guess on. The solver, after the same first reading, is at 5.7 stops on its second guess (it chooses for information, not proximity, per Lemma 2) and at 0.3 on its third, by which point almost every game is over. A player who intersected the constraints exactly would also see the distance collapse; a slow linear decline means each guess is being moved towards the answer by the distance reading alone, a hill-climbing strategy, while the line and zone components are largely discarded.</p>
+
+<section class="exhibit wide" id="ex-hz">
+  <div class="plate"><span class="no">Exhibit 20</span><span class="label">Chance of solving at each guess</span></div>
+  <div class="fig"><div class="legend" id="hzlegend"></div><svg id="hzchart" role="img" aria-label="Hazard of solving by guess index"></svg></div>
+  <p class="plaque">The hazard $h_t = P(\text{solve at guess } t \mid \text{guess } t \text{ is made})$, from correct guesses over guesses made at each index, with Wilson 95% intervals, and the constant-information model of Proposition 4 fitted to each population.</p>
+</section>
+
+<p id="b2-text"></p>
+
+<section class="exhibit wide" id="ex-bands">
+  <div class="plate"><span class="no">Exhibit 21</span><span class="label">How far off each guess is</span>
+    <span class="toggle" role="group" aria-label="Population"><button type="button" id="bands-daily" aria-pressed="true">players, daily</button><button type="button" id="bands-prac" aria-pressed="false">players, practice</button><button type="button" id="bands-solver" aria-pressed="false">solver</button></span></div>
+  <div class="fig"><div class="legend" id="bandslegend"></div><svg id="bandschart" role="img" aria-label="Distance bands by guess index"></svg></div>
+  <p class="plaque">Each guess's distance from the answer in bands, as a share of the guesses made at that index. A guess 11 or more stops away on the third guess or later is evidence that the earlier readings were not combined: by then the solver's candidates almost never lie that far from its guess.</p>
+</section>
+
+<p id="b2b-text"></p>
+
+<h3>8.3 The service-information panel</h3>
+
+<div class="def"><b>Hypothesis B3 (clues help, unevenly).</b> The revealed clues raise the chance of solving, most of all the first letter, which is the clue a person can apply without a map.</div>
+
+<p>The dashboard reports the number of clues shown at the time of each win. Because one clue is revealed per wrong guess, clues shown equals guesses minus one for every win, so this distribution is the solve distribution shifted by one and cannot separate the effect of clues from the effect of having had more guesses. The data identify only one contrast: the first letter arrives before the sixth guess, and the hazard jumps there, from <span data-v="b.h5d"></span> to <span data-v="b.h6d"></span> in daily play and from <span data-v="b.h5p"></span> to <span data-v="b.h6p"></span> in practice, far above the trend of the preceding guesses. The first letter carries 4.10 bits on its own (Exhibit 9) and, unlike the distance clues, can be checked against memory rather than a map. A last-chance effect, players taking more care on the final guess, would produce a jump in the same place, so the jump is consistent with B3 but does not prove it.</p>
+
+<h3>8.4 Familiarity and the curated schedule</h3>
+
+<div class="def"><b>Hypothesis B4 (familiarity).</b> People find unfamiliar stations harder for reasons that have nothing to do with the structure of the network.</div>
+
+<p>The game assigns each daily answer a tier: <em>core</em>, <em>standard</em> or <em>deep</em>. The tier of individual stations is not used here; only the aggregate win rates are. Players win <span data-v="b.core"></span> of core puzzles and <span data-v="b.deep"></span> of deep ones (<span data-v="b.tierz"></span>), and need 3.74 against 4.42 guesses on wins. The solver's difficulty runs the other way. Grouping answers by zone as a proxy for remoteness, the solver needs <span data-v="b.z1"></span> guesses for Zone 1 answers and <span data-v="b.zout"></span> for Zone 7 and beyond: outer stations sit on long branches where a single distance reading isolates them. The contrast supports B4. What makes a station hard for people is that they do not know it, not that the network hides it.</p>
+
+<div class="scroll"><table id="zonetable"></table></div>
+
+<p>The same data expose the curation of daily answers. From King's Cross, the most common opener, a uniformly drawn answer is on average <span data-v="b.kxu"></span> stops away. Practice players opening there see 7.62, within a fraction of a stop of the uniform figure, as practice's uniform draw predicts. Daily players opening there see 6.07, so daily answers are some <span data-v="b.kxgap"></span> stops nearer the centre than uniform. This is a property of the schedule, not of play, and it is the main reason daily and practice statistics differ.</p>
+
+<h3>8.5 Learning</h3>
+
+<div class="def"><b>Hypothesis B5 (learning).</b> Players improve with experience.</div>
+
+<section class="exhibit wide" id="ex-effects">
+  <div class="plate"><span class="no">Exhibit 22</span><span class="label">Effects, with intervals</span></div>
+  <div class="fig"><svg id="forest" role="img" aria-label="Forest plot of win and share rates by group"></svg></div>
+  <p class="plaque">Rates with Wilson 95% intervals for the contrasts tested in this section. Each pair is one hypothesis; the dashed line is the overall daily win rate.</p>
+</section>
+
+<p id="b5-text"></p>
+
+<section class="exhibit wide" id="ex-return">
+  <div class="plate"><span class="no">Exhibit 23</span><span class="label">Who comes back</span></div>
+  <div class="fig"><div class="split"><svg id="returnchart" role="img" aria-label="Share of first-day players returning on day n"></svg><svg id="dayschart" role="img" aria-label="Devices by number of days played"></svg></div></div>
+  <p class="plaque">Left: the share of each day's new players who play again $n$ days later. Right: devices by the number of distinct days they have played, on a log scale.</p>
+</section>
+
+<p id="b5b-text"></p>
+
+<h3>8.6 Time and effort</h3>
+
+<div class="def"><b>Hypothesis B6 (a commuter's game).</b> Daily play follows the working day, and practice is played with less care.</div>
+
+<section class="exhibit wide" id="ex-clock">
+  <div class="plate"><span class="no">Exhibit 24</span><span class="label">The day, hour by hour</span></div>
+  <div class="fig"><div class="split"><svg id="clockchart" role="img" aria-label="Finished games by hour of day"></svg><svg id="durchart" role="img" aria-label="Game duration distribution"></svg></div></div>
+  <p class="plaque">Left: finished games by hour, daily and practice, each as a share of its own total, on a 24-hour dial. Right: how long games take.</p>
+</section>
+
+<p id="b6-text"></p>
+
+<h3>8.7 Sharing and the loss tail</h3>
+
+<div class="def"><b>Hypothesis B7 (selective sharing).</b> Players share wins more readily than losses.</div>
+
+<p id="b7-text"></p>
+
+<p><b>Limitations of this section.</b> Every figure here is an aggregate over games or devices; nothing links a guess to the player who made it, so individual strategies are inferred from population curves and could be produced by mixtures of very different players. Devices stand in for people. Daily answers are curated and their tiers are assigned by the game, so daily comparisons mix player behaviour with puzzle difficulty. Players are self-selected, returning players doubly so. Abandoned games (<span data-v="b.abd"></span> of daily and <span data-v="b.abp"></span> of practice games started) are absent from the finished-game statistics, which therefore flatter players slightly. The hour of day is in London time and play from other time zones blurs it.</p>
+
+<h2><span class="n">9</span>Discussion</h2>
 
 <p>Three properties of the network explain why a one-step rule is near-optimal. Feedback is rich: a single guess from a good opener induces about 150 blocks, so most of the work happens in the first two guesses, where greedy and optimal policies differ least. Blocks after the first guess are small, mostly under ten, and for small blocks the counting bound is nearly tight. And the metric structure (Lemma 2) means good second guesses are plentiful: almost any station far from the first guess trilaterates.</p>
 
 <p>The panel matters more than any choice of opener. Knowing the mode removes 1.5 bits before the first guess, and each later clue refines a block the feedback has already made small. Together they move the expected game from 2.71 guesses to about 2.25 and the worst case from five to four or fewer.</p>
 
-<h2><span class="n">9</span>Limitations and threats to validity</h2>
+<h2><span class="n">10</span>Limitations and threats to validity</h2>
 
 <p><b>Map drift.</b> The solver's graph is rebuilt from TfL Open Data and may disagree with the game's after route changes. The matching diameter and zero-penalty live games suggest agreement today, and the soft-consistency rule (§3) bounds the damage of a disagreement, but the results in §6 are for the solver's graph. <b>Prior.</b> All results assume uniform answers; daily answers are curated and Exhibit 17 shows they differ. <b>Greedy versus optimal.</b> The gaps to the lower bounds are upper bounds on the possible improvement, not measurements of it; the true optimum may lie between. <b>Two implementations.</b> The reference Rust solver and the JavaScript re-implementation used for the figures agree exactly for the best opener on the map alone and to within 0.01 guesses for the others, where ties in $H_1$ are broken by floating-point summation order; with clues they differ slightly (2.264 against <span data-v="ad.mean"></span>), from differences in how clues enter the candidate set and tie-breaking, and both figures are reported. <b>Human data.</b> Dashboard counts are aggregates of finished games from self-selected players; there is no per-game data, so per-guess human behaviour is modelled, not observed.</p>
 
-<h2><span class="n">10</span>Implementation</h2>
+<h2><span class="n">11</span>Implementation</h2>
 
 <p>The solver is one Rust binary (<code>src/main.rs</code>, <code>network.rs</code>, <code>solver.rs</code>, <code>tui.rs</code>, <code>site.rs</code>). A ratatui terminal interface draws the network in Braille in line colours, zooming to the surviving candidates. In automatic mode it drives the live game in a headless Chromium (<code>site.rs</code>): it types each guess, chooses the matching suggestion, reads the rendered feedback row and the service-information panel, and nothing else; requests to the game's analytics endpoint are blocked so automated games stay out of the statistics above. Releases build macOS and static Linux binaries in CI and publish them to a Homebrew tap and as release assets for mise.</p>
 

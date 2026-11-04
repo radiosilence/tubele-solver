@@ -1,0 +1,1437 @@
+{
+  "kpi": [
+    {
+      "devices": 549,
+      "new_devices": 0,
+      "started": 4522,
+      "finished": 4097,
+      "wins": 2994,
+      "win_pct": 73.1,
+      "avg_guesses": 4.16,
+      "avg_seconds": 124,
+      "shares": 132,
+      "devices_estimated": 549,
+      "finished_estimated": 4097
+    }
+  ],
+  "sampling": [
+    {
+      "min_rate": 1,
+      "max_rate": 1,
+      "distinct_rates": 1
+    }
+  ],
+  "activity": [
+    {
+      "bucket": "2026-08-15",
+      "devices": 11,
+      "started": 24,
+      "finished": 0,
+      "wins": 0
+    },
+    {
+      "bucket": "2026-08-16",
+      "devices": 185,
+      "started": 711,
+      "finished": 580,
+      "wins": 414
+    },
+    {
+      "bucket": "2026-08-17",
+      "devices": 96,
+      "started": 370,
+      "finished": 342,
+      "wins": 243
+    },
+    {
+      "bucket": "2026-08-18",
+      "devices": 44,
+      "started": 168,
+      "finished": 155,
+      "wins": 119
+    },
+    {
+      "bucket": "2026-08-19",
+      "devices": 45,
+      "started": 203,
+      "finished": 189,
+      "wins": 144
+    },
+    {
+      "bucket": "2026-08-20",
+      "devices": 35,
+      "started": 101,
+      "finished": 86,
+      "wins": 62
+    },
+    {
+      "bucket": "2026-08-21",
+      "devices": 29,
+      "started": 144,
+      "finished": 133,
+      "wins": 88
+    },
+    {
+      "bucket": "2026-08-22",
+      "devices": 23,
+      "started": 163,
+      "finished": 153,
+      "wins": 108
+    },
+    {
+      "bucket": "2026-08-23",
+      "devices": 16,
+      "started": 98,
+      "finished": 94,
+      "wins": 60
+    },
+    {
+      "bucket": "2026-08-24",
+      "devices": 18,
+      "started": 94,
+      "finished": 91,
+      "wins": 60
+    },
+    {
+      "bucket": "2026-08-25",
+      "devices": 18,
+      "started": 73,
+      "finished": 68,
+      "wins": 53
+    },
+    {
+      "bucket": "2026-08-26",
+      "devices": 17,
+      "started": 55,
+      "finished": 45,
+      "wins": 35
+    },
+    {
+      "bucket": "2026-08-27",
+      "devices": 9,
+      "started": 68,
+      "finished": 65,
+      "wins": 45
+    },
+    {
+      "bucket": "2026-08-28",
+      "devices": 10,
+      "started": 33,
+      "finished": 32,
+      "wins": 24
+    },
+    {
+      "bucket": "2026-08-29",
+      "devices": 8,
+      "started": 48,
+      "finished": 44,
+      "wins": 42
+    },
+    {
+      "bucket": "2026-08-30",
+      "devices": 6,
+      "started": 11,
+      "finished": 11,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-08-31",
+      "devices": 6,
+      "started": 29,
+      "finished": 27,
+      "wins": 21
+    },
+    {
+      "bucket": "2026-09-01",
+      "devices": 15,
+      "started": 53,
+      "finished": 48,
+      "wins": 37
+    },
+    {
+      "bucket": "2026-09-02",
+      "devices": 5,
+      "started": 15,
+      "finished": 10,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-09-03",
+      "devices": 10,
+      "started": 70,
+      "finished": 62,
+      "wins": 28
+    },
+    {
+      "bucket": "2026-09-04",
+      "devices": 9,
+      "started": 96,
+      "finished": 91,
+      "wins": 66
+    },
+    {
+      "bucket": "2026-09-05",
+      "devices": 14,
+      "started": 137,
+      "finished": 132,
+      "wins": 118
+    },
+    {
+      "bucket": "2026-09-06",
+      "devices": 11,
+      "started": 85,
+      "finished": 79,
+      "wins": 71
+    },
+    {
+      "bucket": "2026-09-07",
+      "devices": 9,
+      "started": 51,
+      "finished": 50,
+      "wins": 48
+    },
+    {
+      "bucket": "2026-09-08",
+      "devices": 8,
+      "started": 55,
+      "finished": 52,
+      "wins": 42
+    },
+    {
+      "bucket": "2026-09-09",
+      "devices": 6,
+      "started": 11,
+      "finished": 8,
+      "wins": 7
+    },
+    {
+      "bucket": "2026-09-10",
+      "devices": 5,
+      "started": 40,
+      "finished": 36,
+      "wins": 21
+    },
+    {
+      "bucket": "2026-09-11",
+      "devices": 5,
+      "started": 64,
+      "finished": 63,
+      "wins": 50
+    },
+    {
+      "bucket": "2026-09-12",
+      "devices": 4,
+      "started": 5,
+      "finished": 5,
+      "wins": 3
+    },
+    {
+      "bucket": "2026-09-13",
+      "devices": 7,
+      "started": 21,
+      "finished": 18,
+      "wins": 12
+    },
+    {
+      "bucket": "2026-09-14",
+      "devices": 12,
+      "started": 88,
+      "finished": 82,
+      "wins": 68
+    },
+    {
+      "bucket": "2026-09-15",
+      "devices": 5,
+      "started": 26,
+      "finished": 24,
+      "wins": 21
+    },
+    {
+      "bucket": "2026-09-16",
+      "devices": 7,
+      "started": 33,
+      "finished": 30,
+      "wins": 21
+    },
+    {
+      "bucket": "2026-09-17",
+      "devices": 4,
+      "started": 13,
+      "finished": 10,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-09-18",
+      "devices": 8,
+      "started": 19,
+      "finished": 17,
+      "wins": 12
+    },
+    {
+      "bucket": "2026-09-19",
+      "devices": 6,
+      "started": 42,
+      "finished": 38,
+      "wins": 27
+    },
+    {
+      "bucket": "2026-09-20",
+      "devices": 4,
+      "started": 24,
+      "finished": 23,
+      "wins": 18
+    },
+    {
+      "bucket": "2026-09-21",
+      "devices": 7,
+      "started": 16,
+      "finished": 13,
+      "wins": 10
+    },
+    {
+      "bucket": "2026-09-22",
+      "devices": 6,
+      "started": 79,
+      "finished": 76,
+      "wins": 58
+    },
+    {
+      "bucket": "2026-09-23",
+      "devices": 9,
+      "started": 60,
+      "finished": 56,
+      "wins": 39
+    },
+    {
+      "bucket": "2026-09-24",
+      "devices": 5,
+      "started": 43,
+      "finished": 40,
+      "wins": 29
+    },
+    {
+      "bucket": "2026-09-25",
+      "devices": 11,
+      "started": 67,
+      "finished": 61,
+      "wins": 41
+    },
+    {
+      "bucket": "2026-09-26",
+      "devices": 4,
+      "started": 40,
+      "finished": 40,
+      "wins": 30
+    },
+    {
+      "bucket": "2026-09-27",
+      "devices": 5,
+      "started": 44,
+      "finished": 43,
+      "wins": 38
+    },
+    {
+      "bucket": "2026-09-28",
+      "devices": 5,
+      "started": 53,
+      "finished": 51,
+      "wins": 40
+    },
+    {
+      "bucket": "2026-09-29",
+      "devices": 5,
+      "started": 40,
+      "finished": 38,
+      "wins": 32
+    },
+    {
+      "bucket": "2026-09-30",
+      "devices": 4,
+      "started": 54,
+      "finished": 53,
+      "wins": 45
+    },
+    {
+      "bucket": "2026-10-01",
+      "devices": 4,
+      "started": 8,
+      "finished": 7,
+      "wins": 4
+    },
+    {
+      "bucket": "2026-10-02",
+      "devices": 6,
+      "started": 34,
+      "finished": 30,
+      "wins": 18
+    },
+    {
+      "bucket": "2026-10-03",
+      "devices": 3,
+      "started": 12,
+      "finished": 12,
+      "wins": 7
+    },
+    {
+      "bucket": "2026-10-04",
+      "devices": 4,
+      "started": 34,
+      "finished": 31,
+      "wins": 18
+    },
+    {
+      "bucket": "2026-10-05",
+      "devices": 5,
+      "started": 28,
+      "finished": 25,
+      "wins": 17
+    },
+    {
+      "bucket": "2026-10-06",
+      "devices": 6,
+      "started": 24,
+      "finished": 21,
+      "wins": 13
+    },
+    {
+      "bucket": "2026-10-07",
+      "devices": 5,
+      "started": 16,
+      "finished": 13,
+      "wins": 9
+    },
+    {
+      "bucket": "2026-10-08",
+      "devices": 3,
+      "started": 6,
+      "finished": 6,
+      "wins": 2
+    },
+    {
+      "bucket": "2026-10-09",
+      "devices": 5,
+      "started": 32,
+      "finished": 31,
+      "wins": 26
+    },
+    {
+      "bucket": "2026-10-10",
+      "devices": 4,
+      "started": 11,
+      "finished": 9,
+      "wins": 8
+    },
+    {
+      "bucket": "2026-10-11",
+      "devices": 4,
+      "started": 14,
+      "finished": 12,
+      "wins": 9
+    },
+    {
+      "bucket": "2026-10-12",
+      "devices": 4,
+      "started": 7,
+      "finished": 5,
+      "wins": 3
+    },
+    {
+      "bucket": "2026-10-13",
+      "devices": 7,
+      "started": 33,
+      "finished": 28,
+      "wins": 14
+    },
+    {
+      "bucket": "2026-10-14",
+      "devices": 5,
+      "started": 10,
+      "finished": 7,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-10-15",
+      "devices": 3,
+      "started": 18,
+      "finished": 18,
+      "wins": 11
+    },
+    {
+      "bucket": "2026-10-16",
+      "devices": 4,
+      "started": 46,
+      "finished": 44,
+      "wins": 24
+    },
+    {
+      "bucket": "2026-10-17",
+      "devices": 4,
+      "started": 34,
+      "finished": 33,
+      "wins": 13
+    },
+    {
+      "bucket": "2026-10-18",
+      "devices": 5,
+      "started": 74,
+      "finished": 72,
+      "wins": 68
+    },
+    {
+      "bucket": "2026-10-19",
+      "devices": 8,
+      "started": 63,
+      "finished": 62,
+      "wins": 33
+    },
+    {
+      "bucket": "2026-10-20",
+      "devices": 6,
+      "started": 16,
+      "finished": 14,
+      "wins": 12
+    },
+    {
+      "bucket": "2026-10-21",
+      "devices": 3,
+      "started": 9,
+      "finished": 8,
+      "wins": 5
+    },
+    {
+      "bucket": "2026-10-22",
+      "devices": 6,
+      "started": 17,
+      "finished": 15,
+      "wins": 8
+    },
+    {
+      "bucket": "2026-10-23",
+      "devices": 6,
+      "started": 15,
+      "finished": 14,
+      "wins": 10
+    },
+    {
+      "bucket": "2026-10-24",
+      "devices": 3,
+      "started": 8,
+      "finished": 8,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-10-25",
+      "devices": 3,
+      "started": 3,
+      "finished": 3,
+      "wins": 2
+    },
+    {
+      "bucket": "2026-10-26",
+      "devices": 4,
+      "started": 21,
+      "finished": 20,
+      "wins": 6
+    },
+    {
+      "bucket": "2026-10-27",
+      "devices": 4,
+      "started": 11,
+      "finished": 10,
+      "wins": 8
+    },
+    {
+      "bucket": "2026-10-28",
+      "devices": 6,
+      "started": 28,
+      "finished": 27,
+      "wins": 22
+    },
+    {
+      "bucket": "2026-10-29",
+      "devices": 4,
+      "started": 15,
+      "finished": 12,
+      "wins": 10
+    },
+    {
+      "bucket": "2026-10-30",
+      "devices": 5,
+      "started": 14,
+      "finished": 14,
+      "wins": 13
+    },
+    {
+      "bucket": "2026-10-31",
+      "devices": 3,
+      "started": 17,
+      "finished": 17,
+      "wins": 16
+    },
+    {
+      "bucket": "2026-11-01",
+      "devices": 1,
+      "started": 1,
+      "finished": 1,
+      "wins": 1
+    },
+    {
+      "bucket": "2026-11-02",
+      "devices": 3,
+      "started": 5,
+      "finished": 4,
+      "wins": 4
+    },
+    {
+      "bucket": "2026-11-04",
+      "devices": 1,
+      "started": 1,
+      "finished": 0,
+      "wins": 0
+    }
+  ],
+  "funnel": [
+    {
+      "step": "Made a guess",
+      "devices": 549,
+      "ord": 1
+    },
+    {
+      "step": "Finished",
+      "devices": 468,
+      "ord": 2
+    },
+    {
+      "step": "Won",
+      "devices": 380,
+      "ord": 3
+    },
+    {
+      "step": "Shared",
+      "devices": 31,
+      "ord": 4
+    }
+  ],
+  "guess_distribution": [
+    {
+      "guesses": 0,
+      "games": 1103,
+      "pct": 26.9
+    },
+    {
+      "guesses": 1,
+      "games": 32,
+      "pct": 0.8
+    },
+    {
+      "guesses": 2,
+      "games": 391,
+      "pct": 9.5
+    },
+    {
+      "guesses": 3,
+      "games": 637,
+      "pct": 15.5
+    },
+    {
+      "guesses": 4,
+      "games": 666,
+      "pct": 16.3
+    },
+    {
+      "guesses": 5,
+      "games": 554,
+      "pct": 13.5
+    },
+    {
+      "guesses": 6,
+      "games": 714,
+      "pct": 17.4
+    }
+  ],
+  "solve_clue_distribution": [
+    {
+      "clues_shown": 0,
+      "wins": 32,
+      "pct": 1.1
+    },
+    {
+      "clues_shown": 1,
+      "wins": 398,
+      "pct": 13.3
+    },
+    {
+      "clues_shown": 2,
+      "wins": 644,
+      "pct": 21.5
+    },
+    {
+      "clues_shown": 3,
+      "wins": 669,
+      "pct": 22.3
+    },
+    {
+      "clues_shown": 4,
+      "wins": 559,
+      "pct": 18.7
+    },
+    {
+      "clues_shown": 5,
+      "wins": 692,
+      "pct": 23.1
+    }
+  ],
+  "duration_distribution": [
+    {
+      "band": "Under 30s",
+      "ord": 1,
+      "games": 833
+    },
+    {
+      "band": "30-60s",
+      "ord": 2,
+      "games": 1083
+    },
+    {
+      "band": "1-2 min",
+      "ord": 3,
+      "games": 1222
+    },
+    {
+      "band": "2-5 min",
+      "ord": 4,
+      "games": 748
+    },
+    {
+      "band": "5-10 min",
+      "ord": 5,
+      "games": 128
+    },
+    {
+      "band": "Over 10 min",
+      "ord": 6,
+      "games": 83
+    }
+  ],
+  "time_of_day": [
+    {
+      "hour": 0,
+      "devices": 56,
+      "finished": 105
+    },
+    {
+      "hour": 1,
+      "devices": 22,
+      "finished": 54
+    },
+    {
+      "hour": 2,
+      "devices": 9,
+      "finished": 36
+    },
+    {
+      "hour": 3,
+      "devices": 9,
+      "finished": 26
+    },
+    {
+      "hour": 4,
+      "devices": 15,
+      "finished": 78
+    },
+    {
+      "hour": 5,
+      "devices": 9,
+      "finished": 45
+    },
+    {
+      "hour": 6,
+      "devices": 14,
+      "finished": 42
+    },
+    {
+      "hour": 7,
+      "devices": 21,
+      "finished": 46
+    },
+    {
+      "hour": 8,
+      "devices": 40,
+      "finished": 152
+    },
+    {
+      "hour": 9,
+      "devices": 37,
+      "finished": 190
+    },
+    {
+      "hour": 10,
+      "devices": 56,
+      "finished": 261
+    },
+    {
+      "hour": 11,
+      "devices": 43,
+      "finished": 157
+    },
+    {
+      "hour": 12,
+      "devices": 51,
+      "finished": 195
+    },
+    {
+      "hour": 13,
+      "devices": 48,
+      "finished": 218
+    },
+    {
+      "hour": 14,
+      "devices": 71,
+      "finished": 340
+    },
+    {
+      "hour": 15,
+      "devices": 53,
+      "finished": 225
+    },
+    {
+      "hour": 16,
+      "devices": 56,
+      "finished": 304
+    },
+    {
+      "hour": 17,
+      "devices": 53,
+      "finished": 246
+    },
+    {
+      "hour": 18,
+      "devices": 38,
+      "finished": 183
+    },
+    {
+      "hour": 19,
+      "devices": 30,
+      "finished": 140
+    },
+    {
+      "hour": 20,
+      "devices": 46,
+      "finished": 244
+    },
+    {
+      "hour": 21,
+      "devices": 61,
+      "finished": 304
+    },
+    {
+      "hour": 22,
+      "devices": 58,
+      "finished": 286
+    },
+    {
+      "hour": 23,
+      "devices": 47,
+      "finished": 220
+    }
+  ],
+  "new_vs_returning": [
+    {
+      "cohort": "Returning player",
+      "games": 4097,
+      "win_pct": 73.1,
+      "avg_guesses": 4.16
+    }
+  ],
+  "win_rate_by_tier": [
+    {
+      "tier": "practice",
+      "played": 4097,
+      "wins": 2994,
+      "win_pct": 73.1,
+      "avg_guesses": 4.16
+    }
+  ],
+  "by_flags": [
+    {
+      "flags": "journey:off;trend:off",
+      "played": 4097,
+      "win_pct": 73.1,
+      "avg_guesses": 4.16
+    }
+  ],
+  "stops_away_by_guess": [
+    {
+      "guess_index": 1,
+      "guesses": 4522,
+      "avg_stops": 8.84,
+      "best": 0,
+      "worst": 32
+    },
+    {
+      "guess_index": 2,
+      "guesses": 4397,
+      "avg_stops": 7.81,
+      "best": 0,
+      "worst": 33
+    },
+    {
+      "guess_index": 3,
+      "guesses": 3911,
+      "avg_stops": 6.24,
+      "best": 0,
+      "worst": 32
+    },
+    {
+      "guess_index": 4,
+      "guesses": 3191,
+      "avg_stops": 5.23,
+      "best": 0,
+      "worst": 30
+    },
+    {
+      "guess_index": 5,
+      "guesses": 2444,
+      "avg_stops": 5.02,
+      "best": 0,
+      "worst": 32
+    },
+    {
+      "guess_index": 6,
+      "guesses": 1846,
+      "avg_stops": 4.98,
+      "best": 0,
+      "worst": 28
+    }
+  ],
+  "stops_bands_by_guess": [
+    {
+      "guess_index": 1,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 33
+    },
+    {
+      "guess_index": 1,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 252
+    },
+    {
+      "guess_index": 1,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 1009
+    },
+    {
+      "guess_index": 1,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 1724
+    },
+    {
+      "guess_index": 1,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 1504
+    },
+    {
+      "guess_index": 2,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 401
+    },
+    {
+      "guess_index": 2,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 713
+    },
+    {
+      "guess_index": 2,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 905
+    },
+    {
+      "guess_index": 2,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 1109
+    },
+    {
+      "guess_index": 2,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 1269
+    },
+    {
+      "guess_index": 3,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 654
+    },
+    {
+      "guess_index": 3,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 783
+    },
+    {
+      "guess_index": 3,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 815
+    },
+    {
+      "guess_index": 3,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 834
+    },
+    {
+      "guess_index": 3,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 825
+    },
+    {
+      "guess_index": 4,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 681
+    },
+    {
+      "guess_index": 4,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 709
+    },
+    {
+      "guess_index": 4,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 702
+    },
+    {
+      "guess_index": 4,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 600
+    },
+    {
+      "guess_index": 4,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 499
+    },
+    {
+      "guess_index": 5,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 569
+    },
+    {
+      "guess_index": 5,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 553
+    },
+    {
+      "guess_index": 5,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 537
+    },
+    {
+      "guess_index": 5,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 374
+    },
+    {
+      "guess_index": 5,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 411
+    },
+    {
+      "guess_index": 6,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 710
+    },
+    {
+      "guess_index": 6,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 230
+    },
+    {
+      "guess_index": 6,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 294
+    },
+    {
+      "guess_index": 6,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 255
+    },
+    {
+      "guess_index": 6,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 357
+    }
+  ],
+  "opening_distance": [
+    {
+      "stops_away": 0,
+      "guesses": 33
+    },
+    {
+      "stops_away": 1,
+      "guesses": 115
+    },
+    {
+      "stops_away": 2,
+      "guesses": 137
+    },
+    {
+      "stops_away": 3,
+      "guesses": 297
+    },
+    {
+      "stops_away": 4,
+      "guesses": 327
+    },
+    {
+      "stops_away": 5,
+      "guesses": 385
+    },
+    {
+      "stops_away": 6,
+      "guesses": 374
+    },
+    {
+      "stops_away": 7,
+      "guesses": 342
+    },
+    {
+      "stops_away": 8,
+      "guesses": 321
+    },
+    {
+      "stops_away": 9,
+      "guesses": 360
+    },
+    {
+      "stops_away": 10,
+      "guesses": 327
+    },
+    {
+      "stops_away": 11,
+      "guesses": 264
+    },
+    {
+      "stops_away": 12,
+      "guesses": 275
+    },
+    {
+      "stops_away": 13,
+      "guesses": 203
+    },
+    {
+      "stops_away": 14,
+      "guesses": 165
+    },
+    {
+      "stops_away": 15,
+      "guesses": 158
+    },
+    {
+      "stops_away": 16,
+      "guesses": 113
+    },
+    {
+      "stops_away": 17,
+      "guesses": 96
+    },
+    {
+      "stops_away": 18,
+      "guesses": 52
+    },
+    {
+      "stops_away": 19,
+      "guesses": 51
+    },
+    {
+      "stops_away": 20,
+      "guesses": 36
+    },
+    {
+      "stops_away": 21,
+      "guesses": 21
+    },
+    {
+      "stops_away": 22,
+      "guesses": 21
+    },
+    {
+      "stops_away": 23,
+      "guesses": 14
+    },
+    {
+      "stops_away": 24,
+      "guesses": 9
+    },
+    {
+      "stops_away": 25,
+      "guesses": 7
+    },
+    {
+      "stops_away": 26,
+      "guesses": 5
+    },
+    {
+      "stops_away": 27,
+      "guesses": 4
+    },
+    {
+      "stops_away": 28,
+      "guesses": 2
+    },
+    {
+      "stops_away": 29,
+      "guesses": 3
+    },
+    {
+      "stops_away": 30,
+      "guesses": 1
+    },
+    {
+      "stops_away": 31,
+      "guesses": 1
+    },
+    {
+      "stops_away": 32,
+      "guesses": 3
+    }
+  ],
+  "opening_stations": [
+    {
+      "guess_station": "kings-cross-st-pancras",
+      "opens": 1422,
+      "avg_stops": 7.62,
+      "station": "King's Cross St. Pancras"
+    },
+    {
+      "guess_station": "highbury-and-islington",
+      "opens": 180,
+      "avg_stops": 7.94,
+      "station": "Highbury & Islington"
+    },
+    {
+      "guess_station": "bank",
+      "opens": 157,
+      "avg_stops": 7.55,
+      "station": "Bank"
+    },
+    {
+      "guess_station": "liverpool-street",
+      "opens": 156,
+      "avg_stops": 7.86,
+      "station": "Liverpool Street"
+    },
+    {
+      "guess_station": "gospel-oak",
+      "opens": 144,
+      "avg_stops": 10.25,
+      "station": "Gospel Oak"
+    },
+    {
+      "guess_station": "clapham-junction",
+      "opens": 140,
+      "avg_stops": 12.33,
+      "station": "Clapham Junction"
+    },
+    {
+      "guess_station": "stratford",
+      "opens": 133,
+      "avg_stops": 6.65,
+      "station": "Stratford"
+    },
+    {
+      "guess_station": "paddington",
+      "opens": 108,
+      "avg_stops": 8.8,
+      "station": "Paddington"
+    },
+    {
+      "guess_station": "canary-wharf",
+      "opens": 99,
+      "avg_stops": 5.22,
+      "station": "Canary Wharf"
+    },
+    {
+      "guess_station": "tottenham-court-road",
+      "opens": 92,
+      "avg_stops": 7.6,
+      "station": "Tottenham Court Road"
+    },
+    {
+      "guess_station": "baker-street",
+      "opens": 74,
+      "avg_stops": 8.91,
+      "station": "Baker Street"
+    },
+    {
+      "guess_station": "waterloo",
+      "opens": 68,
+      "avg_stops": 8.4,
+      "station": "Waterloo"
+    },
+    {
+      "guess_station": "oxford-circus",
+      "opens": 67,
+      "avg_stops": 7.51,
+      "station": "Oxford Circus"
+    },
+    {
+      "guess_station": "farringdon",
+      "opens": 59,
+      "avg_stops": 9.02,
+      "station": "Farringdon"
+    },
+    {
+      "guess_station": "willesden-junction",
+      "opens": 58,
+      "avg_stops": 10.22,
+      "station": "Willesden Junction"
+    }
+  ],
+  "share_rate": [
+    {
+      "outcome": "Lost",
+      "finished": 1103,
+      "shared": 5,
+      "share_pct": 0.5
+    },
+    {
+      "outcome": "Won",
+      "finished": 2994,
+      "shared": 62,
+      "share_pct": 2.1
+    }
+  ],
+  "share_method": [
+    {
+      "method": "image_share",
+      "uses": 85
+    },
+    {
+      "method": "web_share",
+      "uses": 40
+    },
+    {
+      "method": "clipboard",
+      "uses": 4
+    },
+    {
+      "method": "whatsapp",
+      "uses": 3
+    }
+  ],
+  "entry_source": [
+    {
+      "source": "Direct or unknown",
+      "devices": 516,
+      "pct": 93.6
+    },
+    {
+      "source": "Text share",
+      "devices": 35,
+      "pct": 6.4
+    }
+  ],
+  "abandoned_games": [
+    {
+      "started": 4522,
+      "finished": 4097,
+      "abandoned": 425,
+      "abandoned_pct": 9.4
+    }
+  ],
+  "day_n_return": [],
+  "returning_players": [
+    {
+      "days_played": 1,
+      "devices": 442
+    },
+    {
+      "days_played": 2,
+      "devices": 52
+    },
+    {
+      "days_played": 3,
+      "devices": 24
+    },
+    {
+      "days_played": 4,
+      "devices": 12
+    },
+    {
+      "days_played": 5,
+      "devices": 3
+    },
+    {
+      "days_played": 6,
+      "devices": 2
+    },
+    {
+      "days_played": 7,
+      "devices": 1
+    },
+    {
+      "days_played": 8,
+      "devices": 5
+    },
+    {
+      "days_played": 9,
+      "devices": 2
+    },
+    {
+      "days_played": 11,
+      "devices": 1
+    },
+    {
+      "days_played": 13,
+      "devices": 1
+    },
+    {
+      "days_played": 24,
+      "devices": 1
+    },
+    {
+      "days_played": 38,
+      "devices": 1
+    },
+    {
+      "days_played": 46,
+      "devices": 1
+    },
+    {
+      "days_played": 48,
+      "devices": 1
+    }
+  ],
+  "guide_views": [
+    {
+      "views": 513,
+      "devices": 73,
+      "per_device": 7.03
+    }
+  ]
+}

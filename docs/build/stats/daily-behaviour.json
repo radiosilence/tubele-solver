@@ -1,0 +1,2046 @@
+{
+  "kpi": [
+    {
+      "devices": 2729,
+      "new_devices": 2698,
+      "started": 9550,
+      "finished": 8933,
+      "wins": 7210,
+      "win_pct": 80.7,
+      "avg_guesses": 3.88,
+      "avg_seconds": 221,
+      "shares": 2105,
+      "devices_estimated": 2729,
+      "finished_estimated": 8933
+    }
+  ],
+  "sampling": [
+    {
+      "min_rate": 1,
+      "max_rate": 1,
+      "distinct_rates": 1
+    }
+  ],
+  "activity": [
+    {
+      "bucket": "2026-08-15",
+      "devices": 84,
+      "started": 84,
+      "finished": 76,
+      "wins": 53
+    },
+    {
+      "bucket": "2026-08-16",
+      "devices": 1216,
+      "started": 1216,
+      "finished": 1050,
+      "wins": 747
+    },
+    {
+      "bucket": "2026-08-17",
+      "devices": 490,
+      "started": 490,
+      "finished": 421,
+      "wins": 256
+    },
+    {
+      "bucket": "2026-08-18",
+      "devices": 276,
+      "started": 276,
+      "finished": 252,
+      "wins": 184
+    },
+    {
+      "bucket": "2026-08-19",
+      "devices": 282,
+      "started": 282,
+      "finished": 267,
+      "wins": 255
+    },
+    {
+      "bucket": "2026-08-20",
+      "devices": 227,
+      "started": 227,
+      "finished": 216,
+      "wins": 179
+    },
+    {
+      "bucket": "2026-08-21",
+      "devices": 161,
+      "started": 161,
+      "finished": 157,
+      "wins": 142
+    },
+    {
+      "bucket": "2026-08-22",
+      "devices": 164,
+      "started": 164,
+      "finished": 154,
+      "wins": 133
+    },
+    {
+      "bucket": "2026-08-23",
+      "devices": 144,
+      "started": 144,
+      "finished": 136,
+      "wins": 121
+    },
+    {
+      "bucket": "2026-08-24",
+      "devices": 150,
+      "started": 151,
+      "finished": 143,
+      "wins": 123
+    },
+    {
+      "bucket": "2026-08-25",
+      "devices": 152,
+      "started": 152,
+      "finished": 142,
+      "wins": 131
+    },
+    {
+      "bucket": "2026-08-26",
+      "devices": 147,
+      "started": 147,
+      "finished": 139,
+      "wins": 102
+    },
+    {
+      "bucket": "2026-08-27",
+      "devices": 159,
+      "started": 159,
+      "finished": 147,
+      "wins": 136
+    },
+    {
+      "bucket": "2026-08-28",
+      "devices": 122,
+      "started": 122,
+      "finished": 114,
+      "wins": 97
+    },
+    {
+      "bucket": "2026-08-29",
+      "devices": 122,
+      "started": 122,
+      "finished": 118,
+      "wins": 107
+    },
+    {
+      "bucket": "2026-08-30",
+      "devices": 115,
+      "started": 115,
+      "finished": 114,
+      "wins": 103
+    },
+    {
+      "bucket": "2026-08-31",
+      "devices": 130,
+      "started": 130,
+      "finished": 124,
+      "wins": 103
+    },
+    {
+      "bucket": "2026-09-01",
+      "devices": 139,
+      "started": 139,
+      "finished": 130,
+      "wins": 121
+    },
+    {
+      "bucket": "2026-09-02",
+      "devices": 119,
+      "started": 119,
+      "finished": 115,
+      "wins": 104
+    },
+    {
+      "bucket": "2026-09-03",
+      "devices": 106,
+      "started": 106,
+      "finished": 103,
+      "wins": 88
+    },
+    {
+      "bucket": "2026-09-04",
+      "devices": 115,
+      "started": 116,
+      "finished": 111,
+      "wins": 77
+    },
+    {
+      "bucket": "2026-09-05",
+      "devices": 118,
+      "started": 119,
+      "finished": 112,
+      "wins": 98
+    },
+    {
+      "bucket": "2026-09-06",
+      "devices": 100,
+      "started": 101,
+      "finished": 99,
+      "wins": 94
+    },
+    {
+      "bucket": "2026-09-07",
+      "devices": 106,
+      "started": 106,
+      "finished": 104,
+      "wins": 98
+    },
+    {
+      "bucket": "2026-09-08",
+      "devices": 116,
+      "started": 116,
+      "finished": 110,
+      "wins": 102
+    },
+    {
+      "bucket": "2026-09-09",
+      "devices": 103,
+      "started": 103,
+      "finished": 100,
+      "wins": 90
+    },
+    {
+      "bucket": "2026-09-10",
+      "devices": 107,
+      "started": 107,
+      "finished": 102,
+      "wins": 84
+    },
+    {
+      "bucket": "2026-09-11",
+      "devices": 96,
+      "started": 96,
+      "finished": 94,
+      "wins": 79
+    },
+    {
+      "bucket": "2026-09-12",
+      "devices": 90,
+      "started": 90,
+      "finished": 86,
+      "wins": 60
+    },
+    {
+      "bucket": "2026-09-13",
+      "devices": 100,
+      "started": 100,
+      "finished": 94,
+      "wins": 73
+    },
+    {
+      "bucket": "2026-09-14",
+      "devices": 103,
+      "started": 103,
+      "finished": 98,
+      "wins": 59
+    },
+    {
+      "bucket": "2026-09-15",
+      "devices": 106,
+      "started": 106,
+      "finished": 99,
+      "wins": 85
+    },
+    {
+      "bucket": "2026-09-16",
+      "devices": 89,
+      "started": 89,
+      "finished": 86,
+      "wins": 75
+    },
+    {
+      "bucket": "2026-09-17",
+      "devices": 101,
+      "started": 101,
+      "finished": 93,
+      "wins": 79
+    },
+    {
+      "bucket": "2026-09-18",
+      "devices": 92,
+      "started": 92,
+      "finished": 85,
+      "wins": 65
+    },
+    {
+      "bucket": "2026-09-19",
+      "devices": 79,
+      "started": 80,
+      "finished": 75,
+      "wins": 66
+    },
+    {
+      "bucket": "2026-09-20",
+      "devices": 76,
+      "started": 76,
+      "finished": 75,
+      "wins": 71
+    },
+    {
+      "bucket": "2026-09-21",
+      "devices": 85,
+      "started": 85,
+      "finished": 83,
+      "wins": 71
+    },
+    {
+      "bucket": "2026-09-22",
+      "devices": 85,
+      "started": 85,
+      "finished": 83,
+      "wins": 63
+    },
+    {
+      "bucket": "2026-09-23",
+      "devices": 81,
+      "started": 81,
+      "finished": 76,
+      "wins": 69
+    },
+    {
+      "bucket": "2026-09-24",
+      "devices": 93,
+      "started": 93,
+      "finished": 88,
+      "wins": 74
+    },
+    {
+      "bucket": "2026-09-25",
+      "devices": 86,
+      "started": 86,
+      "finished": 81,
+      "wins": 66
+    },
+    {
+      "bucket": "2026-09-26",
+      "devices": 73,
+      "started": 73,
+      "finished": 71,
+      "wins": 39
+    },
+    {
+      "bucket": "2026-09-27",
+      "devices": 85,
+      "started": 85,
+      "finished": 82,
+      "wins": 53
+    },
+    {
+      "bucket": "2026-09-28",
+      "devices": 93,
+      "started": 93,
+      "finished": 87,
+      "wins": 61
+    },
+    {
+      "bucket": "2026-09-29",
+      "devices": 85,
+      "started": 85,
+      "finished": 83,
+      "wins": 58
+    },
+    {
+      "bucket": "2026-09-30",
+      "devices": 89,
+      "started": 89,
+      "finished": 87,
+      "wins": 59
+    },
+    {
+      "bucket": "2026-10-01",
+      "devices": 82,
+      "started": 82,
+      "finished": 80,
+      "wins": 61
+    },
+    {
+      "bucket": "2026-10-02",
+      "devices": 75,
+      "started": 75,
+      "finished": 73,
+      "wins": 60
+    },
+    {
+      "bucket": "2026-10-03",
+      "devices": 78,
+      "started": 78,
+      "finished": 74,
+      "wins": 59
+    },
+    {
+      "bucket": "2026-10-04",
+      "devices": 66,
+      "started": 66,
+      "finished": 64,
+      "wins": 47
+    },
+    {
+      "bucket": "2026-10-05",
+      "devices": 82,
+      "started": 82,
+      "finished": 78,
+      "wins": 56
+    },
+    {
+      "bucket": "2026-10-06",
+      "devices": 85,
+      "started": 85,
+      "finished": 82,
+      "wins": 80
+    },
+    {
+      "bucket": "2026-10-07",
+      "devices": 83,
+      "started": 83,
+      "finished": 82,
+      "wins": 72
+    },
+    {
+      "bucket": "2026-10-08",
+      "devices": 73,
+      "started": 73,
+      "finished": 66,
+      "wins": 44
+    },
+    {
+      "bucket": "2026-10-09",
+      "devices": 77,
+      "started": 77,
+      "finished": 72,
+      "wins": 54
+    },
+    {
+      "bucket": "2026-10-10",
+      "devices": 65,
+      "started": 65,
+      "finished": 64,
+      "wins": 56
+    },
+    {
+      "bucket": "2026-10-11",
+      "devices": 72,
+      "started": 72,
+      "finished": 67,
+      "wins": 45
+    },
+    {
+      "bucket": "2026-10-12",
+      "devices": 85,
+      "started": 85,
+      "finished": 80,
+      "wins": 56
+    },
+    {
+      "bucket": "2026-10-13",
+      "devices": 77,
+      "started": 77,
+      "finished": 75,
+      "wins": 60
+    },
+    {
+      "bucket": "2026-10-14",
+      "devices": 66,
+      "started": 66,
+      "finished": 64,
+      "wins": 59
+    },
+    {
+      "bucket": "2026-10-15",
+      "devices": 75,
+      "started": 75,
+      "finished": 73,
+      "wins": 62
+    },
+    {
+      "bucket": "2026-10-16",
+      "devices": 69,
+      "started": 69,
+      "finished": 62,
+      "wins": 42
+    },
+    {
+      "bucket": "2026-10-17",
+      "devices": 59,
+      "started": 59,
+      "finished": 56,
+      "wins": 51
+    },
+    {
+      "bucket": "2026-10-18",
+      "devices": 72,
+      "started": 72,
+      "finished": 69,
+      "wins": 54
+    },
+    {
+      "bucket": "2026-10-19",
+      "devices": 79,
+      "started": 79,
+      "finished": 77,
+      "wins": 64
+    },
+    {
+      "bucket": "2026-10-20",
+      "devices": 83,
+      "started": 83,
+      "finished": 82,
+      "wins": 75
+    },
+    {
+      "bucket": "2026-10-21",
+      "devices": 78,
+      "started": 78,
+      "finished": 73,
+      "wins": 62
+    },
+    {
+      "bucket": "2026-10-22",
+      "devices": 76,
+      "started": 76,
+      "finished": 73,
+      "wins": 68
+    },
+    {
+      "bucket": "2026-10-23",
+      "devices": 75,
+      "started": 75,
+      "finished": 74,
+      "wins": 74
+    },
+    {
+      "bucket": "2026-10-24",
+      "devices": 69,
+      "started": 69,
+      "finished": 65,
+      "wins": 50
+    },
+    {
+      "bucket": "2026-10-25",
+      "devices": 58,
+      "started": 58,
+      "finished": 52,
+      "wins": 34
+    },
+    {
+      "bucket": "2026-10-26",
+      "devices": 74,
+      "started": 74,
+      "finished": 67,
+      "wins": 56
+    },
+    {
+      "bucket": "2026-10-27",
+      "devices": 65,
+      "started": 65,
+      "finished": 62,
+      "wins": 47
+    },
+    {
+      "bucket": "2026-10-28",
+      "devices": 72,
+      "started": 72,
+      "finished": 71,
+      "wins": 62
+    },
+    {
+      "bucket": "2026-10-29",
+      "devices": 70,
+      "started": 70,
+      "finished": 66,
+      "wins": 62
+    },
+    {
+      "bucket": "2026-10-30",
+      "devices": 66,
+      "started": 66,
+      "finished": 63,
+      "wins": 57
+    },
+    {
+      "bucket": "2026-10-31",
+      "devices": 60,
+      "started": 60,
+      "finished": 58,
+      "wins": 52
+    },
+    {
+      "bucket": "2026-11-01",
+      "devices": 56,
+      "started": 56,
+      "finished": 51,
+      "wins": 43
+    },
+    {
+      "bucket": "2026-11-02",
+      "devices": 57,
+      "started": 57,
+      "finished": 52,
+      "wins": 45
+    },
+    {
+      "bucket": "2026-11-03",
+      "devices": 62,
+      "started": 62,
+      "finished": 58,
+      "wins": 48
+    },
+    {
+      "bucket": "2026-11-04",
+      "devices": 47,
+      "started": 47,
+      "finished": 46,
+      "wins": 40
+    }
+  ],
+  "funnel": [
+    {
+      "step": "Made a guess",
+      "devices": 2729,
+      "ord": 1
+    },
+    {
+      "step": "Finished",
+      "devices": 2391,
+      "ord": 2
+    },
+    {
+      "step": "Won",
+      "devices": 1771,
+      "ord": 3
+    },
+    {
+      "step": "Shared",
+      "devices": 594,
+      "ord": 4
+    }
+  ],
+  "guess_distribution": [
+    {
+      "guesses": 0,
+      "games": 1723,
+      "pct": 19.3
+    },
+    {
+      "guesses": 1,
+      "games": 224,
+      "pct": 2.5
+    },
+    {
+      "guesses": 2,
+      "games": 1256,
+      "pct": 14.1
+    },
+    {
+      "guesses": 3,
+      "games": 1591,
+      "pct": 17.8
+    },
+    {
+      "guesses": 4,
+      "games": 1576,
+      "pct": 17.6
+    },
+    {
+      "guesses": 5,
+      "games": 1193,
+      "pct": 13.4
+    },
+    {
+      "guesses": 6,
+      "games": 1370,
+      "pct": 15.3
+    }
+  ],
+  "solve_clue_distribution": [
+    {
+      "clues_shown": 0,
+      "wins": 224,
+      "pct": 3.1
+    },
+    {
+      "clues_shown": 1,
+      "wins": 1257,
+      "pct": 17.4
+    },
+    {
+      "clues_shown": 2,
+      "wins": 1592,
+      "pct": 22.1
+    },
+    {
+      "clues_shown": 3,
+      "wins": 1576,
+      "pct": 21.9
+    },
+    {
+      "clues_shown": 4,
+      "wins": 1192,
+      "pct": 16.5
+    },
+    {
+      "clues_shown": 5,
+      "wins": 1369,
+      "pct": 19
+    }
+  ],
+  "duration_distribution": [
+    {
+      "band": "Under 30s",
+      "ord": 1,
+      "games": 1170
+    },
+    {
+      "band": "30-60s",
+      "ord": 2,
+      "games": 1757
+    },
+    {
+      "band": "1-2 min",
+      "ord": 3,
+      "games": 2578
+    },
+    {
+      "band": "2-5 min",
+      "ord": 4,
+      "games": 2424
+    },
+    {
+      "band": "5-10 min",
+      "ord": 5,
+      "games": 572
+    },
+    {
+      "band": "Over 10 min",
+      "ord": 6,
+      "games": 432
+    }
+  ],
+  "time_of_day": [
+    {
+      "hour": 0,
+      "devices": 286,
+      "finished": 578
+    },
+    {
+      "hour": 1,
+      "devices": 116,
+      "finished": 181
+    },
+    {
+      "hour": 2,
+      "devices": 67,
+      "finished": 104
+    },
+    {
+      "hour": 3,
+      "devices": 67,
+      "finished": 85
+    },
+    {
+      "hour": 4,
+      "devices": 52,
+      "finished": 85
+    },
+    {
+      "hour": 5,
+      "devices": 65,
+      "finished": 107
+    },
+    {
+      "hour": 6,
+      "devices": 130,
+      "finished": 403
+    },
+    {
+      "hour": 7,
+      "devices": 243,
+      "finished": 677
+    },
+    {
+      "hour": 8,
+      "devices": 325,
+      "finished": 792
+    },
+    {
+      "hour": 9,
+      "devices": 348,
+      "finished": 755
+    },
+    {
+      "hour": 10,
+      "devices": 344,
+      "finished": 628
+    },
+    {
+      "hour": 11,
+      "devices": 295,
+      "finished": 471
+    },
+    {
+      "hour": 12,
+      "devices": 281,
+      "finished": 459
+    },
+    {
+      "hour": 13,
+      "devices": 274,
+      "finished": 437
+    },
+    {
+      "hour": 14,
+      "devices": 318,
+      "finished": 403
+    },
+    {
+      "hour": 15,
+      "devices": 273,
+      "finished": 321
+    },
+    {
+      "hour": 16,
+      "devices": 240,
+      "finished": 285
+    },
+    {
+      "hour": 17,
+      "devices": 216,
+      "finished": 301
+    },
+    {
+      "hour": 18,
+      "devices": 216,
+      "finished": 325
+    },
+    {
+      "hour": 19,
+      "devices": 216,
+      "finished": 281
+    },
+    {
+      "hour": 20,
+      "devices": 217,
+      "finished": 267
+    },
+    {
+      "hour": 21,
+      "devices": 239,
+      "finished": 344
+    },
+    {
+      "hour": 22,
+      "devices": 210,
+      "finished": 327
+    },
+    {
+      "hour": 23,
+      "devices": 243,
+      "finished": 317
+    }
+  ],
+  "new_vs_returning": [
+    {
+      "cohort": "Returning player",
+      "games": 6575,
+      "win_pct": 84.7,
+      "avg_guesses": 3.86
+    },
+    {
+      "cohort": "First ever game",
+      "games": 2358,
+      "win_pct": 69.7,
+      "avg_guesses": 3.96
+    }
+  ],
+  "win_rate_by_tier": [
+    {
+      "tier": "standard",
+      "played": 3969,
+      "wins": 3245,
+      "win_pct": 81.8,
+      "avg_guesses": 3.96
+    },
+    {
+      "tier": "core",
+      "played": 4343,
+      "wins": 3498,
+      "win_pct": 80.5,
+      "avg_guesses": 3.74
+    },
+    {
+      "tier": "deep",
+      "played": 621,
+      "wins": 467,
+      "win_pct": 75.2,
+      "avg_guesses": 4.42
+    }
+  ],
+  "by_flags": [
+    {
+      "flags": "journey:off;trend:off",
+      "played": 8933,
+      "win_pct": 80.7,
+      "avg_guesses": 3.88
+    }
+  ],
+  "stops_away_by_guess": [
+    {
+      "guess_index": 1,
+      "guesses": 9550,
+      "avg_stops": 6.22,
+      "best": 0,
+      "worst": 31
+    },
+    {
+      "guess_index": 2,
+      "guesses": 9122,
+      "avg_stops": 5.24,
+      "best": 0,
+      "worst": 33
+    },
+    {
+      "guess_index": 3,
+      "guesses": 7703,
+      "avg_stops": 4.31,
+      "best": 0,
+      "worst": 32
+    },
+    {
+      "guess_index": 4,
+      "guesses": 5978,
+      "avg_stops": 3.53,
+      "best": 0,
+      "worst": 31
+    },
+    {
+      "guess_index": 5,
+      "guesses": 4312,
+      "avg_stops": 3.55,
+      "best": 0,
+      "worst": 28
+    },
+    {
+      "guess_index": 6,
+      "guesses": 3089,
+      "avg_stops": 3.07,
+      "best": 0,
+      "worst": 31
+    }
+  ],
+  "stops_bands_by_guess": [
+    {
+      "guess_index": 1,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 226
+    },
+    {
+      "guess_index": 1,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 1173
+    },
+    {
+      "guess_index": 1,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 3549
+    },
+    {
+      "guess_index": 1,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 3225
+    },
+    {
+      "guess_index": 1,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 1377
+    },
+    {
+      "guess_index": 2,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 1257
+    },
+    {
+      "guess_index": 2,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 1875
+    },
+    {
+      "guess_index": 2,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 2702
+    },
+    {
+      "guess_index": 2,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 2098
+    },
+    {
+      "guess_index": 2,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 1190
+    },
+    {
+      "guess_index": 3,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 1590
+    },
+    {
+      "guess_index": 3,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 1895
+    },
+    {
+      "guess_index": 3,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 2101
+    },
+    {
+      "guess_index": 3,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 1367
+    },
+    {
+      "guess_index": 3,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 750
+    },
+    {
+      "guess_index": 4,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 1576
+    },
+    {
+      "guess_index": 4,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 1685
+    },
+    {
+      "guess_index": 4,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 1437
+    },
+    {
+      "guess_index": 4,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 847
+    },
+    {
+      "guess_index": 4,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 433
+    },
+    {
+      "guess_index": 5,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 1193
+    },
+    {
+      "guess_index": 5,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 1189
+    },
+    {
+      "guess_index": 5,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 960
+    },
+    {
+      "guess_index": 5,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 637
+    },
+    {
+      "guess_index": 5,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 333
+    },
+    {
+      "guess_index": 6,
+      "band": "Correct",
+      "ord": 1,
+      "guesses": 1368
+    },
+    {
+      "guess_index": 6,
+      "band": "1-2 stops",
+      "ord": 2,
+      "guesses": 545
+    },
+    {
+      "guess_index": 6,
+      "band": "3-5 stops",
+      "ord": 3,
+      "guesses": 555
+    },
+    {
+      "guess_index": 6,
+      "band": "6-10 stops",
+      "ord": 4,
+      "guesses": 381
+    },
+    {
+      "guess_index": 6,
+      "band": "11+ stops",
+      "ord": 5,
+      "guesses": 240
+    }
+  ],
+  "opening_distance": [
+    {
+      "stops_away": 0,
+      "guesses": 226
+    },
+    {
+      "stops_away": 1,
+      "guesses": 465
+    },
+    {
+      "stops_away": 2,
+      "guesses": 708
+    },
+    {
+      "stops_away": 3,
+      "guesses": 1105
+    },
+    {
+      "stops_away": 4,
+      "guesses": 1275
+    },
+    {
+      "stops_away": 5,
+      "guesses": 1169
+    },
+    {
+      "stops_away": 6,
+      "guesses": 818
+    },
+    {
+      "stops_away": 7,
+      "guesses": 841
+    },
+    {
+      "stops_away": 8,
+      "guesses": 662
+    },
+    {
+      "stops_away": 9,
+      "guesses": 487
+    },
+    {
+      "stops_away": 10,
+      "guesses": 417
+    },
+    {
+      "stops_away": 11,
+      "guesses": 300
+    },
+    {
+      "stops_away": 12,
+      "guesses": 324
+    },
+    {
+      "stops_away": 13,
+      "guesses": 213
+    },
+    {
+      "stops_away": 14,
+      "guesses": 191
+    },
+    {
+      "stops_away": 15,
+      "guesses": 103
+    },
+    {
+      "stops_away": 16,
+      "guesses": 109
+    },
+    {
+      "stops_away": 17,
+      "guesses": 54
+    },
+    {
+      "stops_away": 18,
+      "guesses": 19
+    },
+    {
+      "stops_away": 19,
+      "guesses": 17
+    },
+    {
+      "stops_away": 20,
+      "guesses": 14
+    },
+    {
+      "stops_away": 21,
+      "guesses": 5
+    },
+    {
+      "stops_away": 22,
+      "guesses": 7
+    },
+    {
+      "stops_away": 23,
+      "guesses": 2
+    },
+    {
+      "stops_away": 24,
+      "guesses": 7
+    },
+    {
+      "stops_away": 25,
+      "guesses": 2
+    },
+    {
+      "stops_away": 26,
+      "guesses": 5
+    },
+    {
+      "stops_away": 28,
+      "guesses": 2
+    },
+    {
+      "stops_away": 31,
+      "guesses": 3
+    }
+  ],
+  "opening_stations": [
+    {
+      "guess_station": "kings-cross-st-pancras",
+      "opens": 2336,
+      "avg_stops": 6.07,
+      "station": "King's Cross St. Pancras"
+    },
+    {
+      "guess_station": "liverpool-street",
+      "opens": 484,
+      "avg_stops": 5.32,
+      "station": "Liverpool Street"
+    },
+    {
+      "guess_station": "bank",
+      "opens": 422,
+      "avg_stops": 4.79,
+      "station": "Bank"
+    },
+    {
+      "guess_station": "baker-street",
+      "opens": 398,
+      "avg_stops": 5.82,
+      "station": "Baker Street"
+    },
+    {
+      "guess_station": "oxford-circus",
+      "opens": 357,
+      "avg_stops": 5.18,
+      "station": "Oxford Circus"
+    },
+    {
+      "guess_station": "victoria",
+      "opens": 282,
+      "avg_stops": 5.67,
+      "station": "Victoria"
+    },
+    {
+      "guess_station": "tottenham-court-road",
+      "opens": 277,
+      "avg_stops": 4.82,
+      "station": "Tottenham Court Road"
+    },
+    {
+      "guess_station": "paddington",
+      "opens": 241,
+      "avg_stops": 5.17,
+      "station": "Paddington"
+    },
+    {
+      "guess_station": "waterloo",
+      "opens": 222,
+      "avg_stops": 4.62,
+      "station": "Waterloo"
+    },
+    {
+      "guess_station": "euston",
+      "opens": 204,
+      "avg_stops": 5.96,
+      "station": "Euston"
+    },
+    {
+      "guess_station": "stratford",
+      "opens": 149,
+      "avg_stops": 5.35,
+      "station": "Stratford"
+    },
+    {
+      "guess_station": "whitechapel",
+      "opens": 141,
+      "avg_stops": 4.7,
+      "station": "Whitechapel"
+    },
+    {
+      "guess_station": "highbury-and-islington",
+      "opens": 140,
+      "avg_stops": 4.79,
+      "station": "Highbury & Islington"
+    },
+    {
+      "guess_station": "canary-wharf",
+      "opens": 120,
+      "avg_stops": 4.57,
+      "station": "Canary Wharf"
+    },
+    {
+      "guess_station": "embankment",
+      "opens": 108,
+      "avg_stops": 5.53,
+      "station": "Embankment"
+    }
+  ],
+  "share_rate": [
+    {
+      "outcome": "Lost",
+      "finished": 1723,
+      "shared": 252,
+      "share_pct": 14.6
+    },
+    {
+      "outcome": "Won",
+      "finished": 7210,
+      "shared": 1573,
+      "share_pct": 21.8
+    }
+  ],
+  "share_method": [
+    {
+      "method": "web_share",
+      "uses": 1465
+    },
+    {
+      "method": "image_share",
+      "uses": 266
+    },
+    {
+      "method": "whatsapp",
+      "uses": 179
+    },
+    {
+      "method": "clipboard",
+      "uses": 167
+    },
+    {
+      "method": "x",
+      "uses": 14
+    },
+    {
+      "method": "image_download",
+      "uses": 14
+    }
+  ],
+  "entry_source": [
+    {
+      "source": "Direct or unknown",
+      "devices": 2454,
+      "pct": 89.6
+    },
+    {
+      "source": "Text share",
+      "devices": 282,
+      "pct": 10.3
+    },
+    {
+      "source": "Image share",
+      "devices": 2,
+      "pct": 0.1
+    }
+  ],
+  "abandoned_games": [
+    {
+      "started": 47,
+      "finished": 46,
+      "abandoned": 1,
+      "abandoned_pct": 2.1
+    },
+    {
+      "started": 62,
+      "finished": 58,
+      "abandoned": 4,
+      "abandoned_pct": 6.5
+    },
+    {
+      "started": 57,
+      "finished": 52,
+      "abandoned": 5,
+      "abandoned_pct": 8.8
+    },
+    {
+      "started": 56,
+      "finished": 51,
+      "abandoned": 5,
+      "abandoned_pct": 8.9
+    },
+    {
+      "started": 60,
+      "finished": 58,
+      "abandoned": 2,
+      "abandoned_pct": 3.3
+    },
+    {
+      "started": 66,
+      "finished": 63,
+      "abandoned": 3,
+      "abandoned_pct": 4.5
+    },
+    {
+      "started": 70,
+      "finished": 66,
+      "abandoned": 4,
+      "abandoned_pct": 5.7
+    },
+    {
+      "started": 71,
+      "finished": 70,
+      "abandoned": 1,
+      "abandoned_pct": 1.4
+    },
+    {
+      "started": 66,
+      "finished": 63,
+      "abandoned": 3,
+      "abandoned_pct": 4.5
+    },
+    {
+      "started": 74,
+      "finished": 67,
+      "abandoned": 7,
+      "abandoned_pct": 9.5
+    },
+    {
+      "started": 58,
+      "finished": 52,
+      "abandoned": 6,
+      "abandoned_pct": 10.3
+    },
+    {
+      "started": 69,
+      "finished": 65,
+      "abandoned": 4,
+      "abandoned_pct": 5.8
+    },
+    {
+      "started": 75,
+      "finished": 74,
+      "abandoned": 1,
+      "abandoned_pct": 1.3
+    },
+    {
+      "started": 76,
+      "finished": 73,
+      "abandoned": 3,
+      "abandoned_pct": 3.9
+    },
+    {
+      "started": 78,
+      "finished": 73,
+      "abandoned": 5,
+      "abandoned_pct": 6.4
+    },
+    {
+      "started": 83,
+      "finished": 82,
+      "abandoned": 1,
+      "abandoned_pct": 1.2
+    },
+    {
+      "started": 79,
+      "finished": 77,
+      "abandoned": 2,
+      "abandoned_pct": 2.5
+    },
+    {
+      "started": 72,
+      "finished": 69,
+      "abandoned": 3,
+      "abandoned_pct": 4.2
+    },
+    {
+      "started": 59,
+      "finished": 56,
+      "abandoned": 3,
+      "abandoned_pct": 5.1
+    },
+    {
+      "started": 69,
+      "finished": 62,
+      "abandoned": 7,
+      "abandoned_pct": 10.1
+    },
+    {
+      "started": 75,
+      "finished": 73,
+      "abandoned": 2,
+      "abandoned_pct": 2.7
+    },
+    {
+      "started": 66,
+      "finished": 64,
+      "abandoned": 2,
+      "abandoned_pct": 3
+    },
+    {
+      "started": 77,
+      "finished": 75,
+      "abandoned": 2,
+      "abandoned_pct": 2.6
+    },
+    {
+      "started": 84,
+      "finished": 79,
+      "abandoned": 5,
+      "abandoned_pct": 6
+    },
+    {
+      "started": 73,
+      "finished": 68,
+      "abandoned": 5,
+      "abandoned_pct": 6.8
+    },
+    {
+      "started": 65,
+      "finished": 64,
+      "abandoned": 1,
+      "abandoned_pct": 1.5
+    },
+    {
+      "started": 77,
+      "finished": 72,
+      "abandoned": 5,
+      "abandoned_pct": 6.5
+    },
+    {
+      "started": 73,
+      "finished": 66,
+      "abandoned": 7,
+      "abandoned_pct": 9.6
+    },
+    {
+      "started": 83,
+      "finished": 82,
+      "abandoned": 1,
+      "abandoned_pct": 1.2
+    },
+    {
+      "started": 85,
+      "finished": 82,
+      "abandoned": 3,
+      "abandoned_pct": 3.5
+    }
+  ],
+  "day_n_return": [
+    {
+      "day_n": 0,
+      "devices": 2710,
+      "cohort": 2718,
+      "pct_of_cohort": 99.7
+    },
+    {
+      "day_n": 1,
+      "devices": 311,
+      "cohort": 2713,
+      "pct_of_cohort": 11.5
+    },
+    {
+      "day_n": 2,
+      "devices": 227,
+      "cohort": 2708,
+      "pct_of_cohort": 8.4
+    },
+    {
+      "day_n": 3,
+      "devices": 196,
+      "cohort": 2704,
+      "pct_of_cohort": 7.2
+    },
+    {
+      "day_n": 4,
+      "devices": 178,
+      "cohort": 2699,
+      "pct_of_cohort": 6.6
+    },
+    {
+      "day_n": 5,
+      "devices": 166,
+      "cohort": 2695,
+      "pct_of_cohort": 6.2
+    },
+    {
+      "day_n": 6,
+      "devices": 162,
+      "cohort": 2690,
+      "pct_of_cohort": 6
+    },
+    {
+      "day_n": 7,
+      "devices": 163,
+      "cohort": 2686,
+      "pct_of_cohort": 6.1
+    },
+    {
+      "day_n": 8,
+      "devices": 156,
+      "cohort": 2682,
+      "pct_of_cohort": 5.8
+    },
+    {
+      "day_n": 9,
+      "devices": 156,
+      "cohort": 2677,
+      "pct_of_cohort": 5.8
+    },
+    {
+      "day_n": 10,
+      "devices": 153,
+      "cohort": 2668,
+      "pct_of_cohort": 5.7
+    },
+    {
+      "day_n": 11,
+      "devices": 139,
+      "cohort": 2662,
+      "pct_of_cohort": 5.2
+    },
+    {
+      "day_n": 12,
+      "devices": 134,
+      "cohort": 2659,
+      "pct_of_cohort": 5
+    },
+    {
+      "day_n": 13,
+      "devices": 125,
+      "cohort": 2656,
+      "pct_of_cohort": 4.7
+    },
+    {
+      "day_n": 14,
+      "devices": 126,
+      "cohort": 2648,
+      "pct_of_cohort": 4.8
+    },
+    {
+      "day_n": 15,
+      "devices": 141,
+      "cohort": 2636,
+      "pct_of_cohort": 5.3
+    },
+    {
+      "day_n": 16,
+      "devices": 116,
+      "cohort": 2630,
+      "pct_of_cohort": 4.4
+    },
+    {
+      "day_n": 17,
+      "devices": 115,
+      "cohort": 2621,
+      "pct_of_cohort": 4.4
+    },
+    {
+      "day_n": 18,
+      "devices": 107,
+      "cohort": 2610,
+      "pct_of_cohort": 4.1
+    },
+    {
+      "day_n": 19,
+      "devices": 111,
+      "cohort": 2607,
+      "pct_of_cohort": 4.3
+    },
+    {
+      "day_n": 20,
+      "devices": 106,
+      "cohort": 2601,
+      "pct_of_cohort": 4.1
+    },
+    {
+      "day_n": 21,
+      "devices": 108,
+      "cohort": 2590,
+      "pct_of_cohort": 4.2
+    },
+    {
+      "day_n": 22,
+      "devices": 115,
+      "cohort": 2588,
+      "pct_of_cohort": 4.4
+    },
+    {
+      "day_n": 23,
+      "devices": 108,
+      "cohort": 2575,
+      "pct_of_cohort": 4.2
+    },
+    {
+      "day_n": 24,
+      "devices": 98,
+      "cohort": 2565,
+      "pct_of_cohort": 3.8
+    },
+    {
+      "day_n": 25,
+      "devices": 95,
+      "cohort": 2558,
+      "pct_of_cohort": 3.7
+    },
+    {
+      "day_n": 26,
+      "devices": 92,
+      "cohort": 2555,
+      "pct_of_cohort": 3.6
+    },
+    {
+      "day_n": 27,
+      "devices": 88,
+      "cohort": 2551,
+      "pct_of_cohort": 3.4
+    },
+    {
+      "day_n": 28,
+      "devices": 92,
+      "cohort": 2547,
+      "pct_of_cohort": 3.6
+    },
+    {
+      "day_n": 29,
+      "devices": 103,
+      "cohort": 2543,
+      "pct_of_cohort": 4.1
+    },
+    {
+      "day_n": 30,
+      "devices": 85,
+      "cohort": 2539,
+      "pct_of_cohort": 3.3
+    }
+  ],
+  "returning_players": [
+    {
+      "days_played": 1,
+      "devices": 2160
+    },
+    {
+      "days_played": 2,
+      "devices": 189
+    },
+    {
+      "days_played": 3,
+      "devices": 71
+    },
+    {
+      "days_played": 4,
+      "devices": 49
+    },
+    {
+      "days_played": 5,
+      "devices": 27
+    },
+    {
+      "days_played": 6,
+      "devices": 27
+    },
+    {
+      "days_played": 7,
+      "devices": 20
+    },
+    {
+      "days_played": 8,
+      "devices": 5
+    },
+    {
+      "days_played": 9,
+      "devices": 13
+    },
+    {
+      "days_played": 10,
+      "devices": 5
+    },
+    {
+      "days_played": 11,
+      "devices": 8
+    },
+    {
+      "days_played": 12,
+      "devices": 2
+    },
+    {
+      "days_played": 13,
+      "devices": 4
+    },
+    {
+      "days_played": 14,
+      "devices": 5
+    },
+    {
+      "days_played": 15,
+      "devices": 4
+    },
+    {
+      "days_played": 16,
+      "devices": 9
+    },
+    {
+      "days_played": 17,
+      "devices": 4
+    },
+    {
+      "days_played": 18,
+      "devices": 5
+    },
+    {
+      "days_played": 19,
+      "devices": 8
+    },
+    {
+      "days_played": 20,
+      "devices": 6
+    },
+    {
+      "days_played": 21,
+      "devices": 3
+    },
+    {
+      "days_played": 22,
+      "devices": 4
+    },
+    {
+      "days_played": 23,
+      "devices": 1
+    },
+    {
+      "days_played": 24,
+      "devices": 2
+    },
+    {
+      "days_played": 25,
+      "devices": 3
+    },
+    {
+      "days_played": 26,
+      "devices": 4
+    },
+    {
+      "days_played": 27,
+      "devices": 2
+    },
+    {
+      "days_played": 28,
+      "devices": 2
+    },
+    {
+      "days_played": 29,
+      "devices": 1
+    },
+    {
+      "days_played": 30,
+      "devices": 1
+    },
+    {
+      "days_played": 32,
+      "devices": 2
+    },
+    {
+      "days_played": 33,
+      "devices": 5
+    },
+    {
+      "days_played": 34,
+      "devices": 2
+    },
+    {
+      "days_played": 35,
+      "devices": 2
+    },
+    {
+      "days_played": 37,
+      "devices": 5
+    },
+    {
+      "days_played": 38,
+      "devices": 2
+    },
+    {
+      "days_played": 40,
+      "devices": 2
+    },
+    {
+      "days_played": 41,
+      "devices": 3
+    },
+    {
+      "days_played": 43,
+      "devices": 3
+    },
+    {
+      "days_played": 44,
+      "devices": 4
+    },
+    {
+      "days_played": 45,
+      "devices": 3
+    },
+    {
+      "days_played": 46,
+      "devices": 2
+    },
+    {
+      "days_played": 47,
+      "devices": 2
+    },
+    {
+      "days_played": 48,
+      "devices": 3
+    },
+    {
+      "days_played": 49,
+      "devices": 2
+    },
+    {
+      "days_played": 50,
+      "devices": 2
+    },
+    {
+      "days_played": 51,
+      "devices": 2
+    },
+    {
+      "days_played": 52,
+      "devices": 3
+    },
+    {
+      "days_played": 53,
+      "devices": 2
+    },
+    {
+      "days_played": 54,
+      "devices": 2
+    },
+    {
+      "days_played": 58,
+      "devices": 1
+    },
+    {
+      "days_played": 59,
+      "devices": 1
+    },
+    {
+      "days_played": 61,
+      "devices": 1
+    },
+    {
+      "days_played": 62,
+      "devices": 4
+    },
+    {
+      "days_played": 63,
+      "devices": 1
+    },
+    {
+      "days_played": 64,
+      "devices": 1
+    },
+    {
+      "days_played": 65,
+      "devices": 1
+    },
+    {
+      "days_played": 66,
+      "devices": 2
+    },
+    {
+      "days_played": 67,
+      "devices": 2
+    },
+    {
+      "days_played": 68,
+      "devices": 3
+    },
+    {
+      "days_played": 69,
+      "devices": 1
+    },
+    {
+      "days_played": 71,
+      "devices": 1
+    },
+    {
+      "days_played": 72,
+      "devices": 1
+    },
+    {
+      "days_played": 74,
+      "devices": 1
+    },
+    {
+      "days_played": 76,
+      "devices": 1
+    },
+    {
+      "days_played": 77,
+      "devices": 1
+    },
+    {
+      "days_played": 78,
+      "devices": 2
+    },
+    {
+      "days_played": 79,
+      "devices": 2
+    },
+    {
+      "days_played": 80,
+      "devices": 2
+    },
+    {
+      "days_played": 81,
+      "devices": 2
+    },
+    {
+      "days_played": 82,
+      "devices": 1
+    }
+  ],
+  "guide_views": [
+    {
+      "views": 6871,
+      "devices": 2650,
+      "per_device": 2.59
+    }
+  ]
+}
