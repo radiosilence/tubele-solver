@@ -38,3 +38,6 @@ tr.sel td { background: color-mix(in oklab, var(--signal) 12%, transparent); }
   .hero svg { height: 62vh; min-height: 340px; width: 100%; }
   .hero-cap { position: static; display: block; margin: .5rem max(16px, env(safe-area-inset-left, 0px)); }
 }
+.origin { margin: 1.4rem 0 0; padding: .9rem 1.1rem; background: var(--panel); border: 1px solid var(--rule); border-left: 4px solid var(--signal); border-radius: 6px; }
+.origin p { margin: 0; font-size: 1.02rem; line-height: 1.55; color: var(--ink); }
+.origin a, .byline a { color: inherit; text-decoration-color: var(--signal); text-underline-offset: 2px; }
